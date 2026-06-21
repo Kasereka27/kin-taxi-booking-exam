@@ -1,4 +1,5 @@
-@extends('root')
+@extends('root', ['cssClass' => 'font-sans text-ink bg-gray-50'])
+
 
 @section('childContent')
 
@@ -6,6 +7,8 @@
     
     @yield('content')
 
-    @include('partials.footer')
+    @section('footer')
+        @include('partials.footer')
+    @show
 
 @endsection
