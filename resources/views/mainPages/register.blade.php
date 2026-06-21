@@ -1,0 +1,52 @@
+@extends('mainPages.app', ['cssClass' => 'font-sans text-ink'])
+
+@section('title', 'Inscription')
+
+@section('childContent')
+<div class="min-h-screen grid lg:grid-cols-2">
+    <aside class="hidden lg:flex flex-col justify-between p-16 bg-ink text-white" style="background-image:radial-gradient(circle at 30% 30%, rgba(255,206,0,0.25), transparent 50%)">
+      <a href="index.html" class="flex items-center gap-2.5 font-black text-2xl text-white"><span class="w-9 h-9 rounded-xl bg-taxi grid place-items-center shadow-taxi text-xl">🚕</span> Taxi<span class="text-taxi-dark">Go</span></a>
+      <div>
+        <h2 class="text-4xl font-black leading-tight">Rejoignez TaxiGo<br>en moins d'une minute.</h2>
+        <p class="text-gray-300 mt-4 max-w-sm">Créez votre compte gratuit et commandez votre première course dès maintenant.</p>
+        <div class="flex gap-10 mt-8">
+          <div><strong class="block text-3xl text-taxi">120k+</strong><span class="text-gray-400 text-sm">Utilisateurs</span></div>
+          <div><strong class="block text-3xl text-taxi">4.9★</strong><span class="text-gray-400 text-sm">Satisfaction</span></div>
+        </div>
+      </div>
+      <p class="text-gray-500 text-sm">© 2026 TaxiGo</p>
+    </aside>
+
+    <main class="flex items-center justify-center p-10">
+      <form class="w-full max-w-md bg-white rounded-2xl p-10 shadow-lg2" data-handler="register">
+        <h1 class="text-3xl font-extrabold">Créer un compte</h1>
+        <p class="text-sm text-gray-500 mb-4">Gratuit et sans engagement.</p>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="mb-4"><label class="block font-semibold mb-1.5 text-sm">Prénom</label><input name="firstname" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Jean" /></div>
+          <div class="mb-4"><label class="block font-semibold mb-1.5 text-sm">Nom</label><input name="lastname" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Dupont" /></div>
+        </div>
+        <div class="mb-4">
+          <label class="block font-semibold mb-1.5 text-sm">Adresse e-mail</label>
+          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">✉️</span><input type="email" name="email" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="vous@email.com" /></div>
+        </div>
+        <div class="mb-4">
+          <label class="block font-semibold mb-1.5 text-sm">Téléphone</label>
+          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">📱</span><input type="tel" name="phone" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="06 12 34 56 78" /></div>
+        </div>
+        <div class="mb-4">
+          <label class="block font-semibold mb-1.5 text-sm">Mot de passe</label>
+          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">🔒</span><input type="password" name="password" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="8 caractères minimum" /></div>
+        </div>
+        <div class="mb-4">
+          <label class="block font-semibold mb-1.5 text-sm">Type de compte</label>
+          <select name="role" class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition"><option value="client">Passager</option><option value="driver">Chauffeur partenaire</option></select>
+        </div>
+        <label class="flex items-center gap-2 text-sm mb-4"><input type="checkbox" required /> J'accepte les <a href="#" class="text-taxi-dark">CGU</a> et la politique de confidentialité.</label>
+        <button class="w-full inline-flex items-center justify-center px-6 py-4 rounded-full font-bold text-lg bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition">Créer mon compte</button>
+
+        <p class="text-center mt-6 text-sm text-gray-500">Déjà inscrit ? <a href="{{ route('login') }}" class="text-taxi-dark font-bold">Se connecter</a></p>
+      </form>
+    </main>
+  </div>
+@endsection

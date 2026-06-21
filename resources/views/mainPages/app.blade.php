@@ -3,8 +3,10 @@
 
 @section('childContent')
 
-    @include('partials.header')
-    
+    @section('header')
+        @include('partials.header')
+    @show
+
     @yield('content')
 
     @section('footer')
