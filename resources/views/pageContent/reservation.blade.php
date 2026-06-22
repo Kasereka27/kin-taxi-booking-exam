@@ -14,19 +14,31 @@
   <section class="py-12">
     <div class="max-w-6xl mx-auto px-5 grid lg:grid-cols-[1.4fr_1fr] gap-6 items-start">
       <!-- Formulaire -->
-      <form class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200" data-handler="booking">
+      <form method="POST" action="{{ route('rides.store') }}" class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200">
+        @csrf
         <h3 class="text-lg font-bold mb-4">Détails du trajet</h3>
+
+        @if ($errors->any())
+          <div class="mb-4 px-4 py-3 rounded-lg text-sm bg-red-100 text-red-700">
+            <ul class="list-disc list-inside space-y-1">
+              @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+              @endforeach
+            </ul>
+          </div>
+        @endif
+
         <div class="mb-4">
           <label class="block font-semibold mb-1.5 text-sm">Adresse de départ</label>
-          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">📍</span><input id="pickup" name="pickup" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Ex : 12 rue de la Paix, Paris" /></div>
+          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">📍</span><input id="pickup" name="pickup_addr" value="{{ old('pickup_addr') }}" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Ex : 12 av. de la Libération, Kinshasa" /></div>
         </div>
         <div class="mb-4">
           <label class="block font-semibold mb-1.5 text-sm">Adresse de destination</label>
-          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">🏁</span><input id="dropoff" name="dropoff" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Ex : Aéroport CDG Terminal 2" /></div>
+          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">🏁</span><input id="dropoff" name="dropoff_addr" value="{{ old('dropoff_addr') }}" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Ex : Aéroport de N'djili" /></div>
         </div>
         <div class="grid grid-cols-2 gap-4">
-          <div class="mb-4"><label class="block font-semibold mb-1.5 text-sm">Date</label><input type="date" name="date" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" /></div>
-          <div class="mb-4"><label class="block font-semibold mb-1.5 text-sm">Heure</label><input type="time" name="time" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" /></div>
+          <div class="mb-4"><label class="block font-semibold mb-1.5 text-sm">Date</label><input type="date" name="date" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" /></div>
+          <div class="mb-4"><label class="block font-semibold mb-1.5 text-sm">Heure</label><input type="time" name="time" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" /></div>
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div class="mb-4"><label class="block font-semibold mb-1.5 text-sm">Passagers</label><select name="passengers" class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition"><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select></div>
@@ -36,9 +48,9 @@
         <label class="block font-semibold mb-2">Type de véhicule</label>
         <input type="hidden" id="vehicleType" name="vehicleType" value="eco" />
         <div class="grid grid-cols-3 gap-3.5 mb-4">
-          <div class="car-option border-2 border-taxi bg-yellow-50 ring-2 ring-taxi rounded-xl p-4 text-center cursor-pointer transition" data-type="eco"><div class="text-3xl">🚗</div><div>Éco</div><div class="font-bold">dès 2,50€</div></div>
-          <div class="car-option border-2 border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:border-taxi transition" data-type="confort"><div class="text-3xl">🚙</div><div>Confort</div><div class="font-bold">dès 4,00€</div></div>
-          <div class="car-option border-2 border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:border-taxi transition" data-type="van"><div class="text-3xl">🚐</div><div>Van</div><div class="font-bold">dès 6,00€</div></div>
+          <div class="car-option border-2 border-taxi bg-yellow-50 ring-2 ring-taxi rounded-xl p-4 text-center cursor-pointer transition" data-type="eco"><div class="text-3xl">🚗</div><div>Éco</div><div class="font-bold">dès 5 000 FC</div></div>
+          <div class="car-option border-2 border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:border-taxi transition" data-type="confort"><div class="text-3xl">🚙</div><div>Confort</div><div class="font-bold">dès 8 000 FC</div></div>
+          <div class="car-option border-2 border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:border-taxi transition" data-type="van"><div class="text-3xl">🚐</div><div>Van</div><div class="font-bold">dès 12 000 FC</div></div>
         </div>
 
         <div class="mb-4">

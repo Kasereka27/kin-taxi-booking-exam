@@ -59,7 +59,7 @@
       <div class="h-px bg-gray-200 my-5"></div>
       <div class="flex justify-between"><span class="text-gray-500">📍 Départ</span><strong>Gare Centrale</strong></div>
       <div class="flex justify-between mt-1"><span class="text-gray-500">🏁 Arrivée</span><strong>Aéroport T2</strong></div>
-      <div class="flex justify-between mt-1 text-lg"><span>Total</span><strong class="text-taxi-dark">32,50 €</strong></div>
+      <div class="flex justify-between mt-1 text-lg"><span>Total</span><strong class="text-taxi-dark">32 500 FC</strong></div>
 
       <button class="w-full mt-6 inline-flex items-center justify-center px-6 py-3 rounded-full font-bold bg-red-600 text-white hover:bg-red-700 transition">Annuler la course</button>
     </aside>

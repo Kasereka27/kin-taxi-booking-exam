@@ -12,5 +12,7 @@
         
         @yield('childContent')
 
+        @yield('scripts')
+
     </body>
 </html>

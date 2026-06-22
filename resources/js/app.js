@@ -109,7 +109,7 @@ const API = {
   }
   
   /* ----- Estimateur de prix ----- */
-  const RATES = { eco: { base: 2.5, km: 1.1 }, confort: { base: 4, km: 1.6 }, van: { base: 6, km: 2.2 } };
+  const RATES = { eco: { base: 5000, km: 3000 }, confort: { base: 8000, km: 4500 }, van: { base: 12000, km: 6000 } };
   
   function initEstimator() {
     ["pickup", "dropoff"].forEach((id) => {
@@ -125,21 +125,22 @@ const API = {
     const type = document.getElementById("vehicleType")?.value || "eco";
     const distance = 8 + Math.random() * 6; // distance simulée (km)
     const r = RATES[type] || RATES.eco;
-    const price = r.base + distance * r.km;
+    const price = Math.round(r.base + distance * r.km);
     const eta = Math.round(distance * 1.8 + 3);
+    const priceFc = price.toLocaleString("fr-FR") + " FC";
     out.innerHTML = `
       <div class="flex justify-between"><span class="text-gray-500">Distance estimée</span><strong>${distance.toFixed(1)} km</strong></div>
       <div class="flex justify-between"><span class="text-gray-500">Durée estimée</span><strong>${eta} min</strong></div>
-      <div class="flex justify-between text-xl mt-2"><span>Prix estimé</span><strong class="text-taxi-dark">${price.toFixed(2)} €</strong></div>`;
+      <div class="flex justify-between text-xl mt-2"><span>Prix estimé</span><strong class="text-taxi-dark">${priceFc}</strong></div>`;
   }
   
   /* ----- Données de démonstration (pour les tableaux) ----- */
   const DEMO = {
     rides: [
-      { id: "TG-1042", date: "18/06 14:30", from: "Gare Centrale", to: "Aéroport T2", driver: "Marc D.", price: "32,50 €", status: "Terminée" },
-      { id: "TG-1041", date: "17/06 09:15", from: "Hôtel Lux", to: "Centre-ville", driver: "Sophie L.", price: "12,00 €", status: "Terminée" },
-      { id: "TG-1040", date: "16/06 22:40", from: "Restaurant Belle", to: "Domicile", driver: "Karim B.", price: "18,75 €", status: "Annulée" },
-      { id: "TG-1039", date: "15/06 07:50", from: "Domicile", to: "Bureau Tech", driver: "Marc D.", price: "9,90 €", status: "Terminée" },
+      { id: "TG-1042", date: "18/06 14:30", from: "Gare Centrale", to: "Aéroport T2", driver: "Marc D.", price: "32 500 FC", status: "Terminée" },
+      { id: "TG-1041", date: "17/06 09:15", from: "Hôtel Lux", to: "Centre-ville", driver: "Sophie L.", price: "12 000 FC", status: "Terminée" },
+      { id: "TG-1040", date: "16/06 22:40", from: "Restaurant Belle", to: "Domicile", driver: "Karim B.", price: "18 750 FC", status: "Annulée" },
+      { id: "TG-1039", date: "15/06 07:50", from: "Domicile", to: "Bureau Tech", driver: "Marc D.", price: "9 900 FC", status: "Terminée" },
     ],
   };
   
