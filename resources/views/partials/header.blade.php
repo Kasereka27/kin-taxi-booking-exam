@@ -3,9 +3,7 @@
 <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-sm border-b border-gray-200">
     <div class="max-w-6xl mx-auto px-5">
       <div class="flex items-center justify-between h-[72px]">
-        <a href="{{ route('home') }}" class="flex items-center gap-2.5 font-black text-2xl">
-          <span class="w-9 h-9 rounded-xl bg-taxi grid place-items-center shadow-taxi text-xl">🚕</span> Taxi<span class="text-taxi-dark">Go</span>
-        </a>
+        @include('partials.brand-logo')
         <nav class="hidden md:flex items-center gap-7">
           <a href="{{ route('home') }}" class="nav-link font-semibold text-gray-600 hover:text-ink transition">Accueil</a>
           <a href="{{ route('reservation') }}" class="nav-link font-semibold text-gray-600 hover:text-ink transition">Réserver</a>
@@ -16,6 +14,7 @@
         </nav>
         <div class="flex items-center gap-3">
           @auth
+            @include('partials.notifications')
             <a href="{{ route(auth()->user()->dashboardRouteName()) }}" class="hidden sm:inline-flex px-4 py-2 rounded-full font-bold text-sm hover:bg-gray-100 transition">Mon espace</a>
             <form method="POST" action="{{ route('logout') }}">
               @csrf
@@ -35,6 +34,18 @@
         <a href="{{ route('tarifs') }}" class="block py-2 font-semibold text-gray-700">Tarifs</a>
         <a href="{{ route('about') }}" class="block py-2 font-semibold text-gray-700">À propos</a>
         <a href="{{ route('contact') }}" class="block py-2 font-semibold text-gray-700">Contact</a>
+        <div class="border-t border-gray-200 mt-2 pt-2">
+          @auth
+            <a href="{{ route(auth()->user()->dashboardRouteName()) }}" class="block py-2 font-semibold text-gray-700">Mon espace</a>
+            <form method="POST" action="{{ route('logout') }}" class="pt-1">
+              @csrf
+              <button type="submit" class="block w-full text-left py-2 font-semibold text-taxi-dark">Déconnexion</button>
+            </form>
+          @else
+            <a href="{{ route('login') }}" class="block py-2 font-semibold text-gray-700">Connexion</a>
+            <a href="{{ route('register') }}" class="block py-2 font-semibold text-taxi-dark">S'inscrire</a>
+          @endauth
+        </div>
       </nav>
     </div>
   </header>

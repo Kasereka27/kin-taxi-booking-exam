@@ -11,8 +11,8 @@
         <h1 class="mt-4 text-5xl font-black leading-tight tracking-tight">Votre taxi en <span class="text-taxi">3 clics</span>, suivi en <span class="text-taxi">temps réel</span></h1>
         <p class="mt-5 text-lg text-gray-300 max-w-lg">Commandez une course, payez en ligne et suivez la position de votre chauffeur en direct sur la carte. Simple, rapide et fiable.</p>
         <div class="flex flex-wrap gap-3.5 mt-8">
-          <a href="reservation.html" class="inline-flex items-center px-8 py-4 rounded-full font-bold text-lg bg-taxi text-ink shadow-taxi hover:bg-taxi-dark hover:-translate-y-0.5 transition">Réserver maintenant</a>
-          <a href="suivi.html" class="inline-flex items-center px-8 py-4 rounded-full font-bold text-lg border-2 border-gray-700 text-white hover:bg-white hover:text-ink transition">Voir le suivi en direct</a>
+          <a href="{{ route('reservation') }}" class="inline-flex items-center px-8 py-4 rounded-full font-bold text-lg bg-taxi text-ink shadow-taxi hover:bg-taxi-dark hover:-translate-y-0.5 transition">Réserver maintenant</a>
+          <a href="{{ route('suivi') }}" class="inline-flex items-center px-8 py-4 rounded-full font-bold text-lg border-2 border-gray-700 text-white hover:bg-white hover:text-ink transition">Voir le suivi en direct</a>
         </div>
         <div class="flex gap-10 mt-12">
           <div><strong class="block text-3xl text-taxi">120k+</strong><span class="text-gray-400 text-sm">Courses / mois</span></div>
@@ -20,19 +20,19 @@
           <div><strong class="block text-3xl text-taxi">4.9★</strong><span class="text-gray-400 text-sm">Note moyenne</span></div>
         </div>
       </div>
-      <div class="bg-white text-ink rounded-2xl p-7 shadow-lg2">
+      <form action="{{ route('reservation') }}" method="GET" class="bg-white text-ink rounded-2xl p-7 shadow-lg2">
         <h3 class="text-xl font-bold mb-4">Estimer ma course</h3>
         <div class="mb-4">
-          <label class="block font-semibold mb-1.5 text-sm">Départ</label>
-          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">📍</span><input class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Adresse de départ" /></div>
+          <label for="hero-pickup" class="block font-semibold mb-1.5 text-sm">Départ</label>
+          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">📍</span><input id="hero-pickup" name="pickup_addr" class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Adresse de départ" /></div>
         </div>
         <div class="mb-4">
-          <label class="block font-semibold mb-1.5 text-sm">Destination</label>
-          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">🏁</span><input class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Adresse d'arrivée" /></div>
+          <label for="hero-dropoff" class="block font-semibold mb-1.5 text-sm">Destination</label>
+          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">🏁</span><input id="hero-dropoff" name="dropoff_addr" class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Adresse d'arrivée" /></div>
         </div>
-        <a href="reservation.html" class="w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-bold bg-ink text-white hover:bg-ink-soft transition">Estimer le prix →</a>
+        <button type="submit" class="w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-bold bg-ink text-white hover:bg-ink-soft transition">Estimer le prix →</button>
         <p class="text-center text-sm text-gray-500 mt-3">Sans engagement · Annulation gratuite</p>
-      </div>
+      </form>
     </div>
   </section>
 
@@ -40,7 +40,7 @@
   <section class="py-20">
     <div class="max-w-6xl mx-auto px-5">
       <div class="text-center mb-10">
-        <span class="inline-block uppercase tracking-widest text-xs font-bold text-taxi-dark bg-taxi/15 px-3.5 py-1.5 rounded-full">Pourquoi TaxiGo</span>
+        <span class="inline-block uppercase tracking-widest text-xs font-bold text-taxi-dark bg-taxi/15 px-3.5 py-1.5 rounded-full">Pourquoi KinTaxiBooking</span>
         <h2 class="mt-4 text-3xl font-extrabold">Tout ce qu'il faut pour voyager sereinement</h2>
         <p class="text-gray-500 mt-3 max-w-xl mx-auto">Une expérience pensée pour le confort et la confiance des passagers comme des chauffeurs.</p>
       </div>
@@ -88,34 +88,15 @@
         <h2 class="text-3xl font-extrabold">Devenez chauffeur partenaire</h2>
         <p class="text-gray-400 max-w-lg mt-2.5">Gérez vos courses, vos revenus et votre planning depuis un tableau de bord dédié.</p>
       </div>
-      <a href="dashboard-chauffeur.html" class="inline-flex items-center px-8 py-4 rounded-full font-bold text-lg bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition">Espace chauffeur</a>
+      @auth
+        @if (auth()->user()->isDriver())
+          <a href="{{ route('user.dashboardDriver') }}" class="inline-flex items-center px-8 py-4 rounded-full font-bold text-lg bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition">Espace chauffeur</a>
+        @else
+          <a href="{{ route('register', ['role' => 'driver']) }}" class="inline-flex items-center px-8 py-4 rounded-full font-bold text-lg bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition">Devenir chauffeur</a>
+        @endif
+      @else
+        <a href="{{ route('register', ['role' => 'driver']) }}" class="inline-flex items-center px-8 py-4 rounded-full font-bold text-lg bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition">Espace chauffeur</a>
+      @endauth
     </div>
   </section>
-@endsection
-
-@section('footer')
-      <!-- Footer -->
-  <footer class="bg-ink text-gray-400 pt-16 pb-7">
-    <div class="max-w-6xl mx-auto px-5">
-      <div class="grid md:grid-cols-4 gap-10">
-        <div>
-          <a href="index.html" class="flex items-center gap-2.5 font-black text-2xl text-white mb-4"><span class="w-9 h-9 rounded-xl bg-taxi grid place-items-center shadow-taxi text-xl">🚕</span> Taxi<span class="text-taxi-dark">Go</span></a>
-          <p>La plateforme de réservation de taxi avec suivi en temps réel. Voyagez l'esprit tranquille.</p>
-          <div class="flex gap-2.5 mt-4">
-            <a href="#" class="w-9 h-9 rounded-full bg-gray-800 grid place-items-center text-white hover:bg-taxi hover:text-ink transition">f</a>
-            <a href="#" class="w-9 h-9 rounded-full bg-gray-800 grid place-items-center text-white hover:bg-taxi hover:text-ink transition">in</a>
-            <a href="#" class="w-9 h-9 rounded-full bg-gray-800 grid place-items-center text-white hover:bg-taxi hover:text-ink transition">X</a>
-            <a href="#" class="w-9 h-9 rounded-full bg-gray-800 grid place-items-center text-white hover:bg-taxi hover:text-ink transition">ig</a>
-          </div>
-        </div>
-        <div><h4 class="text-white font-bold mb-4">Service</h4><a href="reservation.html" class="block py-1.5 hover:text-taxi transition">Réserver</a><a href="suivi.html" class="block py-1.5 hover:text-taxi transition">Suivi en direct</a><a href="tarifs.html" class="block py-1.5 hover:text-taxi transition">Tarifs</a><a href="paiement.html" class="block py-1.5 hover:text-taxi transition">Paiement</a></div>
-        <div><h4 class="text-white font-bold mb-4">Compte</h4><a href="connexion.html" class="block py-1.5 hover:text-taxi transition">Connexion</a><a href="inscription.html" class="block py-1.5 hover:text-taxi transition">Inscription</a><a href="dashboard-client.html" class="block py-1.5 hover:text-taxi transition">Mon espace</a><a href="dashboard-chauffeur.html" class="block py-1.5 hover:text-taxi transition">Chauffeurs</a></div>
-        <div><h4 class="text-white font-bold mb-4">Entreprise</h4><a href="a-propos.html" class="block py-1.5 hover:text-taxi transition">À propos</a><a href="contact.html" class="block py-1.5 hover:text-taxi transition">Contact</a><a href="dashboard-admin.html" class="block py-1.5 hover:text-taxi transition">Administration</a><a href="api-docs.html" class="block py-1.5 hover:text-taxi transition">API développeurs</a></div>
-      </div>
-      <div class="border-t border-gray-800 mt-11 pt-6 flex flex-wrap justify-between gap-3 text-sm">
-        <span>© 2026 TaxiGo. Tous droits réservés.</span>
-        <span>Mentions légales · Confidentialité · CGU</span>
-      </div>
-    </div>
-  </footer>
 @endsection

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TaxiGo — map.js
+   KinTaxiBooking — map.js
    Suivi en temps réel du chauffeur (Leaflet + OpenStreetMap, gratuit).
    Simule un flux WebSocket. À remplacer par votre back-end :
      const ws = new WebSocket("wss://votre-api/rides/ID/track");

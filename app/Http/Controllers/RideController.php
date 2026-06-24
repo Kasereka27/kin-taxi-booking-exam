@@ -4,9 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RideRequest;
 use App\Models\Ride;
+use App\Models\User;
+use App\Notifications\NewRideAvailable;
+use App\Notifications\RideAccepted;
+use App\Notifications\RideCancelled;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 
 class RideController extends Controller
 {
@@ -49,7 +54,7 @@ class RideController extends Controller
 
         $distance = round(random_int(20, 250) / 10, 2);
 
-        $request->user()->ridesAsClient()->create([
+        $ride = $request->user()->ridesAsClient()->create([
             'pickup_addr' => $validated['pickup_addr'],
             'dropoff_addr' => $validated['dropoff_addr'],
             'vehicle_type' => $validated['vehicle_type'],
@@ -58,6 +63,11 @@ class RideController extends Controller
             'price' => Ride::estimatePrice($validated['vehicle_type'], $distance),
             'requested_at' => now(),
         ]);
+
+        $onlineDrivers = User::where('role', 'driver')
+            ->whereHas('driverProfile', fn ($query) => $query->where('is_online', true))
+            ->get();
+        Notification::send($onlineDrivers, new NewRideAvailable($ride));
 
         return redirect()
             ->route('user.dashboardClient')
@@ -106,13 +116,16 @@ class RideController extends Controller
             'price' => $ride->price ?? Ride::estimatePrice($ride->vehicle_type, (float) ($ride->distance_km ?? 0)),
         ]);
 
+        $ride->loadMissing('client');
+        $ride->client?->notify(new RideAccepted($ride));
+
         return back()->with('status', 'Course acceptée. Bonne route !');
     }
 
     /**
      * Annulation d'une course (opération de mise à jour du statut).
      */
-    public function cancel(Ride $ride): RedirectResponse
+    public function cancel(Request $request, Ride $ride): RedirectResponse
     {
         $this->authorize('update', $ride);
 
@@ -120,6 +133,13 @@ class RideController extends Controller
             'status' => 'cancelled',
             'cancelled_at' => now(),
         ]);
+
+        $actor = $request->user();
+        $ride->loadMissing(['client', 'driver']);
+        $recipients = collect([$ride->client, $ride->driver])
+            ->filter()
+            ->reject(fn (User $user) => $user->id === $actor->id);
+        Notification::send($recipients, new RideCancelled($ride, $actor));
 
         return redirect()
             ->route('rides.index')

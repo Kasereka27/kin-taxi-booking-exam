@@ -51,7 +51,7 @@
         <tbody>
           @forelse ($rides as $ride)
             <tr class="border-t border-gray-200 hover:bg-gray-50">
-              <td class="px-4 py-3.5"><strong>TG-{{ $ride->id }}</strong></td>
+              <td class="px-4 py-3.5"><strong>{{ $ride->reference() }}</strong></td>
               <td class="px-4 py-3.5 whitespace-nowrap">{{ $ride->created_at->format('d/m/Y H:i') }}</td>
               <td class="px-4 py-3.5">{{ $ride->pickup_addr }} → {{ $ride->dropoff_addr }}</td>
               <td class="px-4 py-3.5 capitalize">{{ $ride->vehicle_type }}</td>

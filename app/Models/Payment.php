@@ -40,7 +40,7 @@ class Payment extends Model
     }
 
     /**
-     * Montant net encaissé par TaxiGo (montant payé moins la commission Labyrinthe).
+     * Montant net encaissé par KinTaxiBooking (montant payé moins la commission Labyrinthe).
      */
     public function netAmount(): float
     {

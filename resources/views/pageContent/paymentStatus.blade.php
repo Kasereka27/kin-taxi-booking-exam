@@ -27,7 +27,7 @@
       @if ($payment->fee > 0)
         <p class="text-gray-400 text-xs mt-1">dont @fc($payment->fee) de frais Labyrinthe</p>
       @endif
-      <p class="text-gray-500">Course #TG-{{ $payment->ride_id }} · {{ strtoupper($payment->method) }}</p>
+      <p class="text-gray-500">Course #{{ \App\Models\Ride::referenceFor($payment->ride_id) }} · {{ strtoupper($payment->method) }}</p>
 
       @if (session('status'))
         <div class="mt-5 px-4 py-3 rounded-xl bg-blue-50 text-blue-800 text-sm font-semibold">{{ session('status') }}</div>

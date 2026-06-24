@@ -5,7 +5,7 @@
 @section('childContent')
 <div class="min-h-screen grid lg:grid-cols-2">
     <aside class="hidden lg:flex flex-col justify-between p-16 bg-ink text-white" style="background-image:radial-gradient(circle at 30% 30%, rgba(255,206,0,0.25), transparent 50%)">
-      <a href="{{ route('home') }}" class="flex items-center gap-2.5 font-black text-2xl text-white"><span class="w-9 h-9 rounded-xl bg-taxi grid place-items-center shadow-taxi text-xl">🚕</span> Taxi<span class="text-taxi-dark">Go</span></a>
+      @include('partials.brand-logo', ['class' => 'flex items-center gap-2.5 font-black text-2xl text-white'])
       <div>
         <h2 class="text-4xl font-black leading-tight">Bon retour parmi nous.</h2>
         <p class="text-gray-300 mt-4 max-w-sm">Connectez-vous pour réserver une course, suivre votre chauffeur et consulter votre historique.</p>
@@ -15,14 +15,14 @@
           <li class="flex gap-2.5"><span class="text-green-400 font-bold">✓</span> Paiement sécurisé enregistré</li>
         </ul>
       </div>
-      <p class="text-gray-500 text-sm">© 2026 TaxiGo</p>
+      <p class="text-gray-500 text-sm">© {{ date('Y') }} {{ config('app.name', 'KinTaxiBooking') }}</p>
     </aside>
 
     <main class="flex items-center justify-center p-10">
       <form method="POST" action="{{ route('login.store') }}" class="w-full max-w-md bg-white rounded-2xl p-10 shadow-lg2">
         @csrf
         <h1 class="text-3xl font-extrabold">Connexion</h1>
-        <p class="text-sm text-gray-500 mb-4">Accédez à votre espace TaxiGo.</p>
+        <p class="text-sm text-gray-500 mb-4">Accédez à votre espace {{ config('app.name', 'KinTaxiBooking') }}.</p>
 
         @if ($errors->any())
           <div class="mb-4 px-4 py-3 rounded-lg text-sm bg-red-100 text-red-700">

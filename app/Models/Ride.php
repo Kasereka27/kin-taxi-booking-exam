@@ -104,6 +104,22 @@ class Ride extends Model
         return $this->status === 'completed' && ! $this->isPaid();
     }
 
+    /**
+     * Référence publique de la course (ex. KTB-42).
+     */
+    public function reference(): string
+    {
+        return self::referenceFor($this->id);
+    }
+
+    /**
+     * Référence publique à partir de l'identifiant numérique.
+     */
+    public static function referenceFor(int|string $id): string
+    {
+        return 'KTB-'.$id;
+    }
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id');

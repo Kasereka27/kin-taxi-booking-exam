@@ -1,5 +1,5 @@
 /* ==========================================================================
-   TaxiGo — app.js
+   KinTaxiBooking — app.js
    Logique commune : navigation, formulaires, données de démonstration.
    (Front-end seul — prêt à brancher sur une API back-end)
    ========================================================================== */
@@ -25,18 +25,42 @@ const API = {
   
   /* ----- Marquer le lien actif dans la navbar ----- */
   document.addEventListener("DOMContentLoaded", () => {
-    const page = location.pathname.split("/").pop() || "index.html";
+    const path = location.pathname.replace(/\/$/, "") || "/";
     document.querySelectorAll(".nav-link").forEach((a) => {
-      if (a.getAttribute("href") === page) {
-        a.classList.remove("text-gray-600");
-        a.classList.add("text-ink", "font-bold");
+      const href = a.getAttribute("href");
+      if (!href || href.startsWith("#")) return;
+      try {
+        const linkPath = new URL(href, location.origin).pathname.replace(/\/$/, "") || "/";
+        if (linkPath === path) {
+          a.classList.remove("text-gray-600");
+          a.classList.add("text-ink", "font-bold");
+        }
+      } catch (_) {
+        // ignore invalid href
       }
     });
     document.getElementById("menuToggle")?.addEventListener("click", toggleMenu);
+    initNotifications();
     initForms();
     initCarSelect();
     initEstimator();
   });
+
+  /* ----- Menu déroulant des notifications ----- */
+  function initNotifications() {
+    const toggle = document.getElementById("notifToggle");
+    const dropdown = document.getElementById("notifDropdown");
+    if (!toggle || !dropdown) return;
+    toggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dropdown.classList.toggle("hidden");
+    });
+    document.addEventListener("click", (e) => {
+      if (!dropdown.contains(e.target) && !toggle.contains(e.target)) {
+        dropdown.classList.add("hidden");
+      }
+    });
+  }
   
   /* ----- Gestion des formulaires (simulation) ----- */
   function initForms() {
@@ -57,7 +81,7 @@ const API = {
         setTimeout(() => (location.href = "dashboard-client.html"), 1200);
         break;
       case "register":
-        notify(form, "Compte créé avec succès ! Bienvenue chez TaxiGo.", "success");
+        notify(form, "Compte créé avec succès ! Bienvenue sur KinTaxiBooking.", "success");
         setTimeout(() => (location.href = "dashboard-client.html"), 1400);
         break;
       case "booking":
@@ -137,10 +161,10 @@ const API = {
   /* ----- Données de démonstration (pour les tableaux) ----- */
   const DEMO = {
     rides: [
-      { id: "TG-1042", date: "18/06 14:30", from: "Gare Centrale", to: "Aéroport T2", driver: "Marc D.", price: "32 500 FC", status: "Terminée" },
-      { id: "TG-1041", date: "17/06 09:15", from: "Hôtel Lux", to: "Centre-ville", driver: "Sophie L.", price: "12 000 FC", status: "Terminée" },
-      { id: "TG-1040", date: "16/06 22:40", from: "Restaurant Belle", to: "Domicile", driver: "Karim B.", price: "18 750 FC", status: "Annulée" },
-      { id: "TG-1039", date: "15/06 07:50", from: "Domicile", to: "Bureau Tech", driver: "Marc D.", price: "9 900 FC", status: "Terminée" },
+      { id: "KTB-1042", date: "18/06 14:30", from: "Gare Centrale", to: "Aéroport T2", driver: "Marc D.", price: "32 500 FC", status: "Terminée" },
+      { id: "KTB-1041", date: "17/06 09:15", from: "Hôtel Lux", to: "Centre-ville", driver: "Sophie L.", price: "12 000 FC", status: "Terminée" },
+      { id: "KTB-1040", date: "16/06 22:40", from: "Restaurant Belle", to: "Domicile", driver: "Karim B.", price: "18 750 FC", status: "Annulée" },
+      { id: "KTB-1039", date: "15/06 07:50", from: "Domicile", to: "Bureau Tech", driver: "Marc D.", price: "9 900 FC", status: "Terminée" },
     ],
   };
   

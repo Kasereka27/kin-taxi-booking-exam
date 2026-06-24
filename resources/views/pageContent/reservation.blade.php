@@ -30,11 +30,11 @@
 
         <div class="mb-4">
           <label class="block font-semibold mb-1.5 text-sm">Adresse de départ</label>
-          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">📍</span><input id="pickup" name="pickup_addr" value="{{ old('pickup_addr') }}" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Ex : 12 av. de la Libération, Kinshasa" /></div>
+          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">📍</span><input id="pickup" name="pickup_addr" value="{{ old('pickup_addr', request('pickup_addr')) }}" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Ex : 12 av. de la Libération, Kinshasa" /></div>
         </div>
         <div class="mb-4">
           <label class="block font-semibold mb-1.5 text-sm">Adresse de destination</label>
-          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">🏁</span><input id="dropoff" name="dropoff_addr" value="{{ old('dropoff_addr') }}" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Ex : Aéroport de N'djili" /></div>
+          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">🏁</span><input id="dropoff" name="dropoff_addr" value="{{ old('dropoff_addr', request('dropoff_addr')) }}" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Ex : Aéroport de N'djili" /></div>
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div class="mb-4"><label class="block font-semibold mb-1.5 text-sm">Date</label><input type="date" name="date" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" /></div>

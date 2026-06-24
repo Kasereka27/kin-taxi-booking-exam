@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Payment;
 use App\Models\Ride;
 use App\Models\User;
+use App\Notifications\PaymentFailed;
+use App\Notifications\PaymentSucceeded;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -193,6 +195,8 @@ class LabyrinthePaymentService
             'failure_reason' => 'expired',
         ]);
 
+        $this->notifyPaymentOutcome($payment);
+
         return true;
     }
 
@@ -203,6 +207,8 @@ class LabyrinthePaymentService
      */
     public function applyStatus(Payment $payment, int $code, array $payload = []): void
     {
+        $previous = $payment->status;
+
         $status = match ($code) {
             2 => 'success',
             1 => 'failed',
@@ -215,6 +221,29 @@ class LabyrinthePaymentService
             'callback_payload' => json_encode($payload),
             'paid_at' => $status === 'success' ? now() : $payment->paid_at,
         ]);
+
+        // On notifie une seule fois, au moment où le paiement quitte l'état « pending ».
+        if ($previous === 'pending' && in_array($status, ['success', 'failed'], true)) {
+            $this->notifyPaymentOutcome($payment);
+        }
+    }
+
+    /**
+     * Avertit le client de l'issue de son paiement (réussi ou refusé).
+     */
+    private function notifyPaymentOutcome(Payment $payment): void
+    {
+        $client = $payment->user;
+
+        if ($client === null) {
+            return;
+        }
+
+        if ($payment->status === 'success') {
+            $client->notify(new PaymentSucceeded($payment));
+        } elseif ($payment->status === 'failed') {
+            $client->notify(new PaymentFailed($payment));
+        }
     }
 
     private function client(): PendingRequest

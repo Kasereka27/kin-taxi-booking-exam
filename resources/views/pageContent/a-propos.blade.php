@@ -8,7 +8,7 @@
       <div>
         <span class="inline-block uppercase tracking-widest text-xs font-bold text-taxi-dark bg-taxi/15 px-3.5 py-1.5 rounded-full">Notre histoire</span>
         <h1 class="mt-4 text-5xl font-black leading-tight">La mobilité urbaine, <span class="text-taxi">réinventée</span></h1>
-        <p class="mt-5 text-lg text-gray-300 max-w-lg">Depuis 2024, TaxiGo connecte passagers et chauffeurs grâce à une technologie de suivi en temps réel, pour des trajets simples, sûrs et transparents.</p>
+        <p class="mt-5 text-lg text-gray-300 max-w-lg">Depuis 2024, KinTaxiBooking connecte passagers et chauffeurs grâce à une technologie de suivi en temps réel, pour des trajets simples, sûrs et transparents.</p>
       </div>
       <div class="bg-white text-ink rounded-2xl p-7 shadow-lg2">
         <div class="grid grid-cols-2 gap-4">
@@ -46,7 +46,7 @@
 
   <section class="py-20 bg-ink text-white text-center">
     <div class="max-w-6xl mx-auto px-5">
-      <h2 class="text-3xl font-extrabold">Prêt à voyager avec TaxiGo ?</h2>
+      <h2 class="text-3xl font-extrabold">Prêt à voyager avec KinTaxiBooking ?</h2>
       <p class="text-gray-400 mt-2.5">Rejoignez des milliers d'utilisateurs satisfaits.</p>
       <a href="{{ route('reservation') }}" class="inline-flex items-center px-8 py-4 rounded-full font-bold text-lg bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition mt-6">Réserver une course</a>
     </div>

@@ -1,6 +1,6 @@
 @extends('mainPages.app', ['cssClass' => 'font-sans text-ink bg-gray-50'])
 
-@section('title', 'Paiement course TG-'.$ride->id)
+@section('title', 'Paiement course '.$ride->reference())
 
 @section('content')
 <section class="py-10">
@@ -9,7 +9,7 @@
 
     <div class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200 mt-4">
       <h1 class="text-2xl font-extrabold mb-1">Paiement Mobile Money</h1>
-      <p class="text-gray-500 mb-6">Course #TG-{{ $ride->id }}</p>
+      <p class="text-gray-500 mb-6">Course #{{ $ride->reference() }}</p>
 
       <div class="bg-gray-50 rounded-xl px-4 py-3 mb-6 space-y-2">
         <div class="flex justify-between items-center text-sm">

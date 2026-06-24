@@ -9,14 +9,14 @@
 <div class="grid lg:grid-cols-[260px_1fr] min-h-screen">
     <!-- Sidebar -->
     <aside class="bg-ink text-gray-300 p-5 flex lg:flex-col gap-1 overflow-x-auto">
-      <a href="{{ route('home') }}" class="hidden lg:flex items-center gap-2.5 font-black text-2xl text-white mb-8 px-2"><span class="w-9 h-9 rounded-xl bg-taxi grid place-items-center shadow-taxi text-xl">🚕</span> Taxi<span class="text-taxi-dark">Go</span></a>
+      @include('partials.brand-logo', ['class' => 'hidden lg:flex items-center gap-2.5 font-black text-2xl text-white mb-8 px-2'])
       <nav class="flex lg:flex-col gap-1 flex-1">
         <a href="{{ route('user.dashboardClient') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap bg-taxi text-ink">📊 <span class="hidden lg:inline">Tableau de bord</span></a>
         <a href="{{ route('reservation') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">➕ <span class="hidden lg:inline">Nouvelle course</span></a>
         <a href="{{ route('suivi') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">📡 <span class="hidden lg:inline">Suivi en direct</span></a>
         <a href="{{ route('rides.index') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🕓 <span class="hidden lg:inline">Historique</span></a>
-        <a href="#" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">💳 <span class="hidden lg:inline">Paiement</span></a>
-        <a href="#" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">👤 <span class="hidden lg:inline">Profil</span></a>
+        <a href="{{ route('rides.index', ['status' => 'completed']) }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">💳 <span class="hidden lg:inline">Paiement</span></a>
+        <a href="{{ route('contact') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">👤 <span class="hidden lg:inline">Profil</span></a>
         <a href="{{ route('contact') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🛟 <span class="hidden lg:inline">Aide</span></a>
       </nav>
       <div class="hidden lg:block border-t border-gray-800 pt-4 mt-4">
@@ -59,7 +59,7 @@
             <div class="flex gap-3 items-center">
               <span class="w-2 h-2 rounded-full bg-green-500 ring-4 ring-green-100 animate-pulse"></span>
               <div>
-                <strong>Course en cours · #TG-{{ $currentRide->id }}</strong>
+                <strong>Course en cours · #{{ $currentRide->reference() }}</strong>
                 <div class="text-gray-500 text-sm">{{ $currentRide->pickup_addr }} → {{ $currentRide->dropoff_addr }}@if ($currentRide->driver) · {{ $currentRide->driver->firstname }} {{ $currentRide->driver->lastname }}@endif</div>
               </div>
             </div>
@@ -78,7 +78,7 @@
           <tbody>
             @forelse ($recentRides as $ride)
               <tr class="border-t border-gray-200 hover:bg-gray-50">
-                <td class="px-4 py-3.5"><strong>TG-{{ $ride->id }}</strong></td>
+                <td class="px-4 py-3.5"><strong>{{ $ride->reference() }}</strong></td>
                 <td class="px-4 py-3.5">{{ $ride->created_at->format('d/m H:i') }}</td>
                 <td class="px-4 py-3.5">{{ $ride->pickup_addr }} → {{ $ride->dropoff_addr }}</td>
                 <td class="px-4 py-3.5">{{ $ride->driver ? $ride->driver->firstname.' '.$ride->driver->lastname : '—' }}</td>

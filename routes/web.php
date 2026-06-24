@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RideController;
@@ -54,6 +55,15 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::get('/dashboard', 'dashboard')->name('dashboard');
             Route::get('/users', 'users')->name('users');
             Route::patch('/users/{user}/toggle-active', 'toggleUserActive')->name('users.toggle');
+        });
+
+    Route::controller(NotificationController::class)
+        ->prefix('notifications')
+        ->name('notifications.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('/read-all', 'readAll')->name('readAll');
+            Route::post('/{id}/read', 'read')->name('read');
         });
 
     Route::resource('rides', RideController::class)->only(['index', 'store', 'show', 'destroy']);

@@ -24,7 +24,7 @@
         <div class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200 mb-6">
           <h3 class="text-lg font-bold mb-4">Coordonnées</h3>
           <div class="flex gap-3 mb-4 items-center"><span class="text-2xl">📞</span><div><strong>+33 1 23 45 67 89</strong><div class="text-gray-500 text-sm">Support 24h/24</div></div></div>
-          <div class="flex gap-3 mb-4 items-center"><span class="text-2xl">✉️</span><div><strong>support@taxigo.fr</strong><div class="text-gray-500 text-sm">Réponse sous 24h</div></div></div>
+          <div class="flex gap-3 mb-4 items-center"><span class="text-2xl">✉️</span><div><strong>support@kintaxibooking.com</strong><div class="text-gray-500 text-sm">Réponse sous 24h</div></div></div>
           <div class="flex gap-3 items-center"><span class="text-2xl">📍</span><div><strong>10 avenue de l'Opéra, Paris</strong><div class="text-gray-500 text-sm">75001, France</div></div></div>
         </div>
         <div class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200">

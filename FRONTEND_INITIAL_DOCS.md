@@ -1,4 +1,4 @@
-# 🚕 TaxiGo — Application de réservation de taxi avec suivi en temps réel
+# 🚕 KinTaxiBooking — Application de réservation de taxi avec suivi en temps réel
 
 Front-end **HTML + Tailwind CSS + JavaScript** complet, prêt à être branché sur une API back-end.
 Design jaune & noir moderne, responsive, avec carte de suivi en temps réel (Leaflet + OpenStreetMap, gratuit).
@@ -62,7 +62,7 @@ Le front est conçu pour être facilement connecté à une API REST + WebSocket.
 2. **Formulaires** : la fonction `handleForm()` dans `app.js` simule les soumissions — remplacez les `setTimeout` par des appels `fetch(API.base + ...)`.
 3. **Suivi temps réel** : dans `assets/js/map.js`, remplacez la simulation par un WebSocket :
    ```js
-   const ws = new WebSocket("wss://api.taxigo.fr/api/v1/rides/ID/track");
+   const ws = new WebSocket("wss://api.kintaxibooking.com/api/v1/rides/ID/track");
    ws.onmessage = (e) => { const d = JSON.parse(e.data); driver.setLatLng([d.lat, d.lng]); };
    ```
 4. **Endpoints** : voir `api-docs.html` pour le contrat complet.
@@ -102,5 +102,5 @@ HTML5 · **Tailwind CSS v4** (CDN navigateur) · JavaScript vanilla · Leaflet (
 > Tailwind v4 cible les navigateurs récents (Safari 16.4+, Chrome 111+, Firefox 128+).
 
 ---
-© 2026 TaxiGo.
+© 2026 KinTaxiBooking.
 

@@ -26,7 +26,7 @@
 @section('content')
 <div class="grid lg:grid-cols-[260px_1fr] min-h-screen">
     <aside class="bg-ink text-gray-300 p-5 flex lg:flex-col gap-1 overflow-x-auto">
-      <a href="{{ route('home') }}" class="hidden lg:flex items-center gap-2.5 font-black text-2xl text-white mb-8 px-2"><span class="w-9 h-9 rounded-xl bg-taxi grid place-items-center shadow-taxi text-xl">🚕</span> Taxi<span class="text-taxi-dark">Go</span></a>
+      @include('partials.brand-logo', ['class' => 'hidden lg:flex items-center gap-2.5 font-black text-2xl text-white mb-8 px-2'])
       <nav class="flex lg:flex-col gap-1 flex-1">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap bg-taxi text-ink">📊 <span class="hidden lg:inline">Vue d'ensemble</span></a>
         <a href="#courses" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🚕 <span class="hidden lg:inline">Courses</span></a>
@@ -69,7 +69,7 @@
           <tbody>
             @forelse ($liveRides as $ride)
             <tr class="border-t border-gray-200 hover:bg-gray-50">
-              <td class="px-4 py-3.5"><strong>TG-{{ str_pad((string) $ride->id, 4, '0', STR_PAD_LEFT) }}</strong></td>
+              <td class="px-4 py-3.5"><strong>{{ $ride->reference() }}</strong></td>
               <td class="px-4 py-3.5">{{ $ride->client?->firstname }} {{ Str::limit($ride->client?->lastname, 1, '.') }}</td>
               <td class="px-4 py-3.5">{{ $ride->driver ? $ride->driver->firstname.' '.Str::limit($ride->driver->lastname, 1, '.') : '—' }}</td>
               <td class="px-4 py-3.5 whitespace-nowrap">{{ Str::before($ride->pickup_addr, ',') }} → {{ Str::before($ride->dropoff_addr, ',') }}</td>

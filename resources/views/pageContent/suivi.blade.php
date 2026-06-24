@@ -10,7 +10,7 @@
     <!-- Panneau -->
     <aside class="bg-white border-l border-gray-200 p-7 overflow-y-auto">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-bold">Course <span class="text-gray-500">#TG-1042</span></h2>
+        <h2 class="text-xl font-bold">Course <span class="text-gray-500">#KTB-1042</span></h2>
         <span id="ride-status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700">Chauffeur en route</span>
       </div>
 

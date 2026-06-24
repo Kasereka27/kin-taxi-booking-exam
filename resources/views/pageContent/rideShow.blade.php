@@ -1,6 +1,6 @@
 @extends('mainPages.app', ['cssClass' => 'font-sans text-ink bg-gray-50'])
 
-@section('title', 'Course TG-'.$ride->id)
+@section('title', 'Course '.$ride->reference())
 
 @section('content')
 <section class="py-10">
@@ -9,7 +9,7 @@
 
     <div class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200 mt-4">
       <div class="flex justify-between items-center flex-wrap gap-3 mb-6">
-        <h1 class="text-2xl font-extrabold">Course #TG-{{ $ride->id }}</h1>
+        <h1 class="text-2xl font-extrabold">Course #{{ $ride->reference() }}</h1>
         @php($cls = match ($ride->status) { 'completed' => 'bg-green-100 text-green-700', 'cancelled' => 'bg-red-100 text-red-700', 'pending' => 'bg-gray-100 text-gray-700', default => 'bg-yellow-100 text-yellow-700' })
         <span class="inline-flex px-3 py-1 rounded-full text-xs font-bold {{ $cls }}">{{ $ride->statusLabel() }}</span>
       </div>
