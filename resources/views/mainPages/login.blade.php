@@ -24,6 +24,10 @@
         <h1 class="text-3xl font-extrabold">Connexion</h1>
         <p class="text-sm text-gray-500 mb-4">Accédez à votre espace {{ config('app.name', 'KinTaxiBooking') }}.</p>
 
+        @if (session('status'))
+          <div class="mb-4 px-4 py-3 rounded-lg text-sm bg-green-100 text-green-700 font-medium">{{ session('status') }}</div>
+        @endif
+
         @if ($errors->any())
           <div class="mb-4 px-4 py-3 rounded-lg text-sm bg-red-100 text-red-700">
             <ul class="list-disc list-inside space-y-1">
@@ -44,12 +48,14 @@
         </div>
         <div class="flex justify-between items-center mb-4">
           <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="remember" /> Se souvenir de moi</label>
-          <a href="#" class="text-taxi-dark font-semibold text-sm">Mot de passe oublié ?</a>
+          <a href="{{ route('password.request') }}" class="text-taxi-dark font-semibold text-sm">Mot de passe oublié ?</a>
         </div>
         <button class="w-full inline-flex items-center justify-center px-6 py-4 rounded-full font-bold text-lg bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition">Se connecter</button>
 
-        <div class="flex items-center gap-3 text-gray-400 text-sm my-5"><div class="flex-1 h-px bg-gray-200"></div>ou<div class="flex-1 h-px bg-gray-200"></div></div>
-        <button type="button" class="w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-bold border-2 border-gray-300 hover:border-ink hover:bg-ink hover:text-white transition">Continuer avec Google</button>
+        @if (config('services.google.client_id'))
+          <div class="flex items-center gap-3 text-gray-400 text-sm my-5"><div class="flex-1 h-px bg-gray-200"></div>ou<div class="flex-1 h-px bg-gray-200"></div></div>
+          <a href="{{ route('auth.google.redirect') }}" class="w-full inline-flex items-center justify-center px-6 py-3 rounded-full font-bold border-2 border-gray-300 hover:border-ink hover:bg-ink hover:text-white transition">Continuer avec Google</a>
+        @endif
 
         <p class="text-center mt-6 text-sm text-gray-500">Pas encore de compte ? <a href="{{ route('register') }}" class="text-taxi-dark font-bold">Créer un compte</a></p>
       </form>

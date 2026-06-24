@@ -15,6 +15,7 @@
         <a href="{{ route('suivi') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🗺️ <span class="hidden lg:inline">Course active</span></a>
         <a href="{{ route('rides.index') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🕓 <span class="hidden lg:inline">Mes courses</span></a>
         <a href="#revenus" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">💰 <span class="hidden lg:inline">Revenus</span></a>
+        <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">👤 <span class="hidden lg:inline">Profil</span></a>
         <a href="{{ route('contact') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🛟 <span class="hidden lg:inline">Support</span></a>
       </nav>
       <div class="hidden lg:block border-t border-gray-800 pt-4 mt-4">

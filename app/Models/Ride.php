@@ -120,6 +120,81 @@ class Ride extends Model
         return 'KTB-'.$id;
     }
 
+    /**
+     * Statuts pour lesquels le suivi en direct est pertinent.
+     *
+     * @var list<string>
+     */
+    public static function trackableStatuses(): array
+    {
+        return ['pending', 'assigned', 'approche', 'course'];
+    }
+
+    public function isTrackable(): bool
+    {
+        return in_array($this->status, self::trackableStatuses(), true);
+    }
+
+    /**
+     * Coordonnées [lat, lng] du point de prise en charge (Kinshasa par défaut si absentes).
+     *
+     * @return array{0: float, 1: float}
+     */
+    public function pickupCoordinates(): array
+    {
+        if ($this->pickup_lat !== null && $this->pickup_lng !== null) {
+            return [(float) $this->pickup_lat, (float) $this->pickup_lng];
+        }
+
+        return self::fallbackCoordinates((int) $this->id, 1);
+    }
+
+    /**
+     * @return array{0: float, 1: float}
+     */
+    public function dropoffCoordinates(): array
+    {
+        if ($this->dropoff_lat !== null && $this->dropoff_lng !== null) {
+            return [(float) $this->dropoff_lat, (float) $this->dropoff_lng];
+        }
+
+        return self::fallbackCoordinates((int) $this->id, 2);
+    }
+
+    /**
+     * Position estimée du chauffeur pour la carte (profil ou zone proche du départ).
+     *
+     * @return array{0: float, 1: float}|null
+     */
+    public function driverCoordinates(): ?array
+    {
+        if ($this->driver_id === null) {
+            return null;
+        }
+
+        $profile = $this->driver?->driverProfile;
+
+        if ($profile?->current_lat !== null && $profile?->current_lng !== null) {
+            return [(float) $profile->current_lat, (float) $profile->current_lng];
+        }
+
+        [$lat, $lng] = $this->pickupCoordinates();
+
+        return [$lat - 0.018, $lng - 0.012];
+    }
+
+    /**
+     * @return array{0: float, 1: float}
+     */
+    private static function fallbackCoordinates(int $id, int $slot): array
+    {
+        $baseLat = -4.3217;
+        $baseLng = 15.3125;
+        $spread = (($id * 11 + $slot * 17) % 50) / 1000;
+
+        return [$baseLat + $spread, $baseLng + ($spread * 0.8)];
+    }
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id');

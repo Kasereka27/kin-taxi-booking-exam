@@ -1,10 +1,15 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RideController;
 use App\Http\Controllers\UserController;
@@ -18,7 +23,16 @@ Route::controller(MainController::class)
         Route::get('/tarifs', 'tarifs')->name('tarifs');
         Route::get('/about', 'about')->name('about');
         Route::get('/contact', 'contact')->name('contact');
+        Route::get('/cgu', 'cgu')->name('legal.cgu');
+        Route::get('/confidentialite', 'privacy')->name('legal.privacy');
+        Route::post('/contact', [ContactController::class, 'store'])
+            ->middleware('throttle:5,1')
+            ->name('contact.store');
     });
+
+Route::middleware(['auth', 'active'])->group(function () {
+    Route::get('/suivi/{ride}', [MainController::class, 'trackRide'])->name('suivi.ride');
+});
 
 Route::middleware('guest')->group(function () {
     Route::controller(LoginController::class)->group(function () {
@@ -30,10 +44,31 @@ Route::middleware('guest')->group(function () {
         Route::get('/register', 'register')->name('register');
         Route::post('/register', 'store')->name('register.store');
     });
+
+    Route::controller(ForgotPasswordController::class)->group(function () {
+        Route::get('/forgot-password', 'create')->name('password.request');
+        Route::post('/forgot-password', 'store')->name('password.email');
+    });
+
+    Route::controller(ResetPasswordController::class)->group(function () {
+        Route::get('/reset-password/{token}', 'create')->name('password.reset');
+        Route::post('/reset-password', 'store')->name('password.update');
+    });
+
+    Route::controller(GoogleAuthController::class)->prefix('auth/google')->name('auth.google.')->group(function () {
+        Route::get('/redirect', 'redirect')->name('redirect');
+        Route::get('/callback', 'callback')->name('callback');
+    });
 });
 
 Route::middleware(['auth', 'active'])->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+
+    Route::controller(ProfileController::class)->prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', 'edit')->name('edit');
+        Route::patch('/', 'update')->name('update');
+        Route::patch('/password', 'updatePassword')->name('password');
+    });
 
     Route::controller(UserController::class)
         ->prefix('user')

@@ -57,7 +57,7 @@
           <label class="block font-semibold mb-1.5 text-sm">Type de compte</label>
           <select name="role" class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition"><option value="client" @selected(old('role', request('role')) === 'client')>Passager</option><option value="driver" @selected(old('role', request('role')) === 'driver')>Chauffeur partenaire</option></select>
         </div>
-        <label class="flex items-center gap-2 text-sm mb-4"><input type="checkbox" required /> J'accepte les <a href="#" class="text-taxi-dark">CGU</a> et la politique de confidentialité.</label>
+        <label class="flex items-center gap-2 text-sm mb-4"><input type="checkbox" required /> J'accepte les <a href="{{ route('legal.cgu') }}" class="text-taxi-dark">CGU</a> et la <a href="{{ route('legal.privacy') }}" class="text-taxi-dark">politique de confidentialité</a>.</label>
         <button class="w-full inline-flex items-center justify-center px-6 py-4 rounded-full font-bold text-lg bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition">Créer mon compte</button>
 
         <p class="text-center mt-6 text-sm text-gray-500">Déjà inscrit ? <a href="{{ route('login') }}" class="text-taxi-dark font-bold">Se connecter</a></p>

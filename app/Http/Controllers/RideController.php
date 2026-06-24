@@ -142,7 +142,7 @@ class RideController extends Controller
         Notification::send($recipients, new RideCancelled($ride, $actor));
 
         return redirect()
-            ->route('rides.index')
+            ->back(fallback: route('rides.index'))
             ->with('success', 'La course a été annulée.');
     }
 }

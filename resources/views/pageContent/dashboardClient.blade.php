@@ -16,7 +16,7 @@
         <a href="{{ route('suivi') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">📡 <span class="hidden lg:inline">Suivi en direct</span></a>
         <a href="{{ route('rides.index') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🕓 <span class="hidden lg:inline">Historique</span></a>
         <a href="{{ route('rides.index', ['status' => 'completed']) }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">💳 <span class="hidden lg:inline">Paiement</span></a>
-        <a href="{{ route('contact') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">👤 <span class="hidden lg:inline">Profil</span></a>
+        <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">👤 <span class="hidden lg:inline">Profil</span></a>
         <a href="{{ route('contact') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🛟 <span class="hidden lg:inline">Aide</span></a>
       </nav>
       <div class="hidden lg:block border-t border-gray-800 pt-4 mt-4">
@@ -63,7 +63,7 @@
                 <div class="text-gray-500 text-sm">{{ $currentRide->pickup_addr }} → {{ $currentRide->dropoff_addr }}@if ($currentRide->driver) · {{ $currentRide->driver->firstname }} {{ $currentRide->driver->lastname }}@endif</div>
               </div>
             </div>
-            <a href="{{ route('suivi') }}" class="inline-flex px-4 py-2 rounded-full font-bold text-sm bg-ink text-white hover:bg-ink-soft transition">Suivre en direct →</a>
+            <a href="{{ route('suivi.ride', $currentRide) }}" class="inline-flex px-4 py-2 rounded-full font-bold text-sm bg-ink text-white hover:bg-ink-soft transition">Suivre en direct →</a>
           </div>
         </div>
       @endif

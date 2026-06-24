@@ -52,7 +52,11 @@
     </div>
     <div class="border-t border-gray-800 mt-11 pt-6 flex flex-wrap justify-between gap-3 text-sm">
       <span>© {{ date('Y') }} {{ config('app.name', 'KinTaxiBooking') }}. Tous droits réservés.</span>
-      <a href="{{ route('contact') }}" class="hover:text-taxi transition">Support &amp; informations légales</a>
+      <div class="flex flex-wrap gap-4">
+        <a href="{{ route('legal.cgu') }}" class="hover:text-taxi transition">CGU</a>
+        <a href="{{ route('legal.privacy') }}" class="hover:text-taxi transition">Confidentialité</a>
+        <a href="{{ route('contact') }}" class="hover:text-taxi transition">Support</a>
+      </div>
     </div>
   </div>
 </footer>
