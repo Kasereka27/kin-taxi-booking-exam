@@ -14,11 +14,16 @@ class Payment extends Model
     protected $fillable = [
         'ride_id',
         'user_id',
+        'order_number',
         'method',
         'provider_reference',
         'amount',
+        'fee',
+        'currency',
         'status',
+        'failure_reason',
         'receipt_path',
+        'callback_payload',
         'paid_at',
     ];
 
@@ -29,8 +34,27 @@ class Payment extends Model
     {
         return [
             'amount' => 'decimal:2',
+            'fee' => 'decimal:2',
             'paid_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Montant net encaissé par TaxiGo (montant payé moins la commission Labyrinthe).
+     */
+    public function netAmount(): float
+    {
+        return (float) $this->amount - (float) $this->fee;
+    }
+
+    public function isSuccessful(): bool
+    {
+        return $this->status === 'success';
+    }
+
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
     }
 
     public function ride(): BelongsTo

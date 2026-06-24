@@ -21,7 +21,12 @@ class RidePolicy
 
     public function view(User $user, Ride $ride): bool
     {
-        return $ride->client_id === $user->id || $ride->driver_id === $user->id;
+        if ($ride->client_id === $user->id || $ride->driver_id === $user->id) {
+            return true;
+        }
+
+        // Un chauffeur peut consulter une demande en attente non encore assignée.
+        return $user->isDriver() && $ride->status === 'pending' && $ride->driver_id === null;
     }
 
     public function update(User $user, Ride $ride): bool
@@ -32,5 +37,13 @@ class RidePolicy
     public function delete(User $user, Ride $ride): bool
     {
         return $ride->client_id === $user->id && $ride->status === 'pending';
+    }
+
+    /**
+     * Seul le client propriétaire peut régler une course terminée non encore payée.
+     */
+    public function pay(User $user, Ride $ride): bool
+    {
+        return $ride->client_id === $user->id && $ride->isPayable();
     }
 }

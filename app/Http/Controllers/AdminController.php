@@ -21,7 +21,8 @@ class AdminController extends Controller
         $revenueMonth = (float) Payment::where('status', 'success')
             ->whereMonth('paid_at', $today->month)
             ->whereYear('paid_at', $today->year)
-            ->sum('amount');
+            ->selectRaw('COALESCE(SUM(amount - fee), 0) as net')
+            ->value('net');
 
         $onlineDrivers = DriverProfile::where('is_online', true)->count();
 
@@ -55,7 +56,7 @@ class AdminController extends Controller
             ->get();
 
         $paymentsByMethod = Payment::where('status', 'success')
-            ->selectRaw('method, count(*) as count, sum(amount) as total')
+            ->selectRaw('method, count(*) as count, sum(amount - fee) as total')
             ->groupBy('method')
             ->orderByDesc('total')
             ->get();
@@ -65,7 +66,8 @@ class AdminController extends Controller
         $chartLabels = $days->map(fn ($day) => ucfirst($day->translatedFormat('D d/m')))->all();
         $chartRevenue = $days->map(fn ($day) => (float) Payment::where('status', 'success')
             ->whereDate('paid_at', $day)
-            ->sum('amount'))->all();
+            ->selectRaw('COALESCE(SUM(amount - fee), 0) as net')
+            ->value('net'))->all();
         $chartRides = $days->map(fn ($day) => Ride::whereDate('requested_at', $day)->count())->all();
 
         return view('pageContent.dashboardAdmin', [

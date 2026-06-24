@@ -49,6 +49,19 @@
         </div>
       </div>
 
+      @if ($ride->status === 'completed')
+        <div class="mt-7 pt-6 border-t border-gray-200 flex items-center justify-between flex-wrap gap-3">
+          @if ($ride->isPaid())
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">✅ Course payée</span>
+          @else
+            <span class="text-gray-500 text-sm">Cette course n'est pas encore réglée.</span>
+            @can('pay', $ride)
+              <a href="{{ route('rides.pay', $ride) }}" class="inline-flex px-5 py-2.5 rounded-full font-bold bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition">Payer @fc($ride->price)</a>
+            @endcan
+          @endif
+        </div>
+      @endif
+
       @can('update', $ride)
         @if ($ride->status === 'pending')
           <div class="flex gap-3 mt-7 pt-6 border-t border-gray-200">

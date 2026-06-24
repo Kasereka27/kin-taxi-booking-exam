@@ -88,6 +88,22 @@ class Ride extends Model
         return self::statusLabels()[$this->status] ?? $this->status;
     }
 
+    /**
+     * Indique si la course a déjà été réglée avec succès.
+     */
+    public function isPaid(): bool
+    {
+        return $this->payments()->where('status', 'success')->exists();
+    }
+
+    /**
+     * Indique si la course est éligible à un paiement (terminée et non encore réglée).
+     */
+    public function isPayable(): bool
+    {
+        return $this->status === 'completed' && ! $this->isPaid();
+    }
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(User::class, 'client_id');

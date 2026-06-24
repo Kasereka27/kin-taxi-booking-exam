@@ -8,7 +8,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/map.js'])
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     </head>
-    <body @isset($cssClass) class="{{ $cssClass }}" @endisset>
+    <body @isset($cssClass) class="{{ $cssClass }} min-h-screen flex flex-col" @else class="min-h-screen flex flex-col" @endisset>
         
         @yield('childContent')
 

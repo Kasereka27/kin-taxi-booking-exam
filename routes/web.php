@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MainController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RideController;
 use App\Http\Controllers\UserController;
@@ -57,4 +58,14 @@ Route::middleware(['auth', 'active'])->group(function () {
 
     Route::resource('rides', RideController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::patch('/rides/{ride}/cancel', [RideController::class, 'cancel'])->name('rides.cancel');
+    Route::patch('/rides/{ride}/accept', [RideController::class, 'accept'])
+        ->middleware('role:driver')
+        ->name('rides.accept');
+
+    Route::middleware('role:client')->group(function () {
+        Route::get('/rides/{ride}/pay', [PaymentController::class, 'create'])->name('rides.pay');
+        Route::post('/rides/{ride}/pay', [PaymentController::class, 'store'])->name('rides.pay.store');
+        Route::get('/payments/{payment}/status', [PaymentController::class, 'status'])->name('payments.status');
+        Route::get('/payments/{payment}/poll', [PaymentController::class, 'poll'])->name('payments.poll');
+    });
 });

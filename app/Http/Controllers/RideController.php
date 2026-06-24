@@ -85,6 +85,31 @@ class RideController extends Controller
     }
 
     /**
+     * Un chauffeur accepte une course en attente et se la voit assignée.
+     */
+    public function accept(Request $request, Ride $ride): RedirectResponse
+    {
+        $driver = $request->user();
+
+        if (! $driver->isDriver()) {
+            abort(403);
+        }
+
+        if ($ride->status !== 'pending' || $ride->driver_id !== null) {
+            return back()->with('error', 'Cette course n’est plus disponible.');
+        }
+
+        $ride->update([
+            'driver_id' => $driver->id,
+            'status' => 'assigned',
+            'accepted_at' => now(),
+            'price' => $ride->price ?? Ride::estimatePrice($ride->vehicle_type, (float) ($ride->distance_km ?? 0)),
+        ]);
+
+        return back()->with('status', 'Course acceptée. Bonne route !');
+    }
+
+    /**
      * Annulation d'une course (opération de mise à jour du statut).
      */
     public function cancel(Ride $ride): RedirectResponse

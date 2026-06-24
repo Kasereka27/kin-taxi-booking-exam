@@ -7,7 +7,9 @@
         @include('partials.header')
     @show
 
-    @yield('content')
+    <main class="flex-1">
+        @yield('content')
+    </main>
 
     @section('footer')
         @include('partials.footer')

@@ -74,6 +74,14 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+        // Courses terminées NON payées à petit montant (100 FC) pour tester le paiement Mobile Money.
+        Ride::factory(4)->create([
+            'client_id' => $testClient->id,
+            'driver_id' => $drivers->random()->id,
+            'price' => 100,
+            'distance_km' => 1,
+        ]);
+
         foreach (range(1, 6) as $ignored) {
             Ride::factory()->pending()->create([
                 'client_id' => $clients->random()->id,

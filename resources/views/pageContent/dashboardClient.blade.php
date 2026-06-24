@@ -73,7 +73,7 @@
       <div class="overflow-x-auto rounded-xl border border-gray-200">
         <table class="w-full bg-white">
           <thead><tr class="bg-gray-50 text-gray-700 text-xs uppercase tracking-wide">
-            <th class="text-left px-4 py-3.5 font-bold">Réf.</th><th class="text-left px-4 py-3.5 font-bold">Date</th><th class="text-left px-4 py-3.5 font-bold">Trajet</th><th class="text-left px-4 py-3.5 font-bold">Chauffeur</th><th class="text-left px-4 py-3.5 font-bold">Montant</th><th class="text-left px-4 py-3.5 font-bold">Statut</th>
+            <th class="text-left px-4 py-3.5 font-bold">Réf.</th><th class="text-left px-4 py-3.5 font-bold">Date</th><th class="text-left px-4 py-3.5 font-bold">Trajet</th><th class="text-left px-4 py-3.5 font-bold">Chauffeur</th><th class="text-left px-4 py-3.5 font-bold">Montant</th><th class="text-left px-4 py-3.5 font-bold">Statut</th><th class="text-left px-4 py-3.5 font-bold">Action</th>
           </tr></thead>
           <tbody>
             @forelse ($recentRides as $ride)
@@ -87,9 +87,18 @@
                   @php($cls = match ($ride->status) { 'completed' => 'bg-green-100 text-green-700', 'cancelled' => 'bg-red-100 text-red-700', default => 'bg-yellow-100 text-yellow-700' })
                   <span class="inline-flex px-3 py-1 rounded-full text-xs font-bold {{ $cls }}">{{ $ride->statusLabel() }}</span>
                 </td>
+                <td class="px-4 py-3.5">
+                  @if ($ride->isPayable())
+                    <a href="{{ route('rides.pay', $ride) }}" class="inline-flex px-3 py-1.5 rounded-full text-xs font-bold bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition">Payer</a>
+                  @elseif ($ride->status === 'completed')
+                    <span class="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">Payée</span>
+                  @else
+                    <a href="{{ route('rides.show', $ride) }}" class="text-taxi-dark font-semibold text-sm">Voir</a>
+                  @endif
+                </td>
               </tr>
             @empty
-              <tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">Aucune course pour le moment. <a href="{{ route('reservation') }}" class="text-taxi-dark font-semibold">Réservez votre première course →</a></td></tr>
+              <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">Aucune course pour le moment. <a href="{{ route('reservation') }}" class="text-taxi-dark font-semibold">Réservez votre première course →</a></td></tr>
             @endforelse
           </tbody>
         </table>
