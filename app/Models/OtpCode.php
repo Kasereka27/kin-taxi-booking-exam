@@ -35,4 +35,9 @@ class OtpCode extends Model
     {
         return $this->expires_at->isPast();
     }
+
+    public function isUsed(): bool
+    {
+        return $this->used_at !== null;
+    }
 }

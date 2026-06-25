@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\LoginRequest;
+use App\Services\TwoFactorService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,6 +11,8 @@ use Illuminate\View\View;
 
 class LoginController extends Controller
 {
+    public function __construct(private TwoFactorService $twoFactorService) {}
+
     public function login(): View
     {
         return view('mainPages.login');
@@ -33,6 +36,10 @@ class LoginController extends Controller
             return back()
                 ->withErrors(['email' => 'Votre compte est désactivé. Contactez l\'administrateur.'])
                 ->onlyInput('email');
+        }
+
+        if ($user->two_factor_enabled) {
+            return $this->twoFactorService->initiatePendingLogin($user, $request->boolean('remember'));
         }
 
         $request->session()->regenerate();

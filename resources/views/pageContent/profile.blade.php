@@ -83,6 +83,51 @@
     @endif
 
     <div class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200">
+      <form method="POST" action="{{ route('profile.two-factor') }}" class="space-y-4">
+        @csrf
+        @method('PATCH')
+        <h3 class="font-bold text-lg">Double authentification (2FA)</h3>
+        <p class="text-sm text-gray-500">Recevez un code par e-mail à chaque connexion pour renforcer la sécurité de votre compte.</p>
+
+        @if ($errors->has('two_factor_enabled') || $errors->has('current_password'))
+          <div class="px-4 py-3 rounded-lg text-sm bg-red-100 text-red-700">
+            <ul class="list-disc list-inside space-y-1">
+              @foreach (['two_factor_enabled', 'current_password'] as $field)
+                @foreach ($errors->get($field) as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+              @endforeach
+            </ul>
+          </div>
+        @endif
+
+        <label class="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            name="two_factor_enabled"
+            value="1"
+            @checked(old('two_factor_enabled', $user->two_factor_enabled))
+            class="mt-1"
+          />
+          <span>
+            <span class="font-semibold block">Activer la double authentification</span>
+            <span class="text-sm text-gray-500">Un code à 6 chiffres sera envoyé à {{ $user->email }} lors de chaque connexion.</span>
+          </span>
+        </label>
+
+        @if ($user->password)
+          <div>
+            <label class="block font-semibold mb-1.5 text-sm">Mot de passe actuel</label>
+            <input type="password" name="current_password" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" />
+            <p class="text-xs text-gray-400 mt-1">Requis pour activer ou désactiver le 2FA.</p>
+          </div>
+        @endif
+
+        <button type="submit" class="inline-flex px-6 py-3 rounded-full font-bold border-2 border-gray-300 hover:border-ink hover:bg-ink hover:text-white transition">Enregistrer la sécurité</button>
+      </form>
+    </div>
+
+    <div class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200">
       <form method="POST" action="{{ route('profile.password') }}" class="space-y-4">
         @csrf
         @method('PATCH')

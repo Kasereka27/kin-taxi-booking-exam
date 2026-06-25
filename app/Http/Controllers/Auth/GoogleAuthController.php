@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\TwoFactorService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -12,6 +13,8 @@ use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthController extends Controller
 {
+    public function __construct(private TwoFactorService $twoFactorService) {}
+
     public function redirect(): RedirectResponse
     {
         if (! config('services.google.client_id')) {
@@ -45,6 +48,10 @@ class GoogleAuthController extends Controller
             return redirect()
                 ->route('login')
                 ->withErrors(['email' => 'Votre compte est désactivé. Contactez l\'administrateur.']);
+        }
+
+        if ($user->two_factor_enabled) {
+            return $this->twoFactorService->initiatePendingLogin($user, remember: true);
         }
 
         Auth::login($user, remember: true);

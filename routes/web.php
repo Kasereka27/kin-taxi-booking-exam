@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MainController;
@@ -33,6 +34,13 @@ Route::controller(MainController::class)
 
 Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/suivi/{ride}', [MainController::class, 'trackRide'])->name('suivi.ride');
+});
+
+Route::controller(TwoFactorController::class)->prefix('two-factor')->name('two-factor.')->group(function () {
+    Route::get('/', 'show')->name('show');
+    Route::post('/', 'store')->middleware('throttle:5,1')->name('store');
+    Route::post('/resend', 'resend')->middleware('throttle:3,1')->name('resend');
+    Route::post('/cancel', 'cancel')->name('cancel');
 });
 
 Route::middleware('guest')->group(function () {
@@ -69,6 +77,7 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/', 'edit')->name('edit');
         Route::patch('/', 'update')->name('update');
         Route::patch('/password', 'updatePassword')->name('password');
+        Route::patch('/two-factor', 'updateTwoFactor')->name('two-factor');
     });
 
     Route::controller(UserController::class)
