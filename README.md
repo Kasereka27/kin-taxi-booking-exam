@@ -1,281 +1,224 @@
-# README — Examen Final Laravel
-### Faculté des Sciences Informatiques (FASI) — Université Protestant du Congo (UPC)
-### Promotion L3 · Année académique 2025–2026
+# KinTaxiBooking
+
+**Application web de réservation de taxi avec suivi en temps réel — Kinshasa, RDC**
+
+| | |
+|---|---|
+| **Étudiant** | KASEREKA SALAMBUNGU SABIN |
+| **Institution** | Faculté des Sciences Informatiques (FASI) — UPC |
+| **Promotion** | L3 · Année académique 2025–2026 |
+| **Cours** | Laravel — Examen final |
+| **Dépôt GitHub** | [github.com/Kasereka27/kin-taxi-booking-exam](https://github.com/Kasereka27/kin-taxi-booking-exam) |
 
 ---
 
-## Objectif du projet
+## Description
 
-Concevoir et développer une application web complète avec **Laravel**, en respectant les bonnes pratiques du développement moderne. Le projet doit démontrer la maîtrise des concepts fondamentaux et avancés vus en cours, tout en répondant à un besoin réel et concret.
-
----
-
-## Structure attendue du dépôt
-
-```
-nom-du-projet/
-├── app/
-│   ├── Http/
-│   │   ├── Controllers/
-│   │   ├── Middleware/
-│   │   └── Requests/
-│   ├── Models/
-│   └── Mail/
-├── database/
-│   ├── migrations/
-│   └── seeders/
-├── resources/
-│   ├── views/
-│   └── lang/
-├── routes/
-│   ├── web.php
-│   └── api.php
-├── .env.example
-├── README.md
-└── ...
-```
+KinTaxiBooking permet à un **client** de réserver une course, de la payer via **Mobile Money** (Labyrinthe RDC), et de **suivre son chauffeur en direct** sur une carte Google Maps. Les **chauffeurs** acceptent les courses et mettent à jour leur position. Les **administrateurs** pilotent la plateforme via un tableau de bord statistique.
 
 ---
 
-## Exigences techniques
+## Technologies
 
-Les exigences sont classées en **3 niveaux** : Fondamentaux, Intermédiaires, et Avancés.
+| Composant | Version / outil |
+|-----------|-----------------|
+| PHP | 8.4 |
+| Laravel | 13.x |
+| Base de données | SQLite (dev) / MySQL ou PostgreSQL (prod) |
+| Front-end | Blade, Tailwind CSS 4, Vite 8 |
+| Temps réel | Laravel Reverb + Echo |
+| Cartographie | Google Maps (+ Mapbox en alternative) |
+| Paiement | API Labyrinthe RDC (M-Pesa, Airtel, Orange) |
+| PDF | DomPDF (`barryvdh/laravel-dompdf`) |
+| OAuth | Laravel Socialite (Google) |
+| Tests | Pest 4 (93 tests) |
 
----
-
-### Niveau 1 — Fondamentaux *(obligatoires)*
-
-#### 1. Architecture MVC & Structure du projet
-- Respect strict de l'architecture MVC (Models, Views, Controllers)
-- Code organisé, lisible et commenté
-- Utilisation des conventions de nommage Laravel
-
-#### 2. Base de données & Migrations
-- Toutes les tables créées via des **migrations** (aucune table créée manuellement)
-- Utilisation des **relations Eloquent** (hasMany, belongsTo, belongsToMany, etc.)
-- **Seeders** pour peupler la base de données avec des données de test réalistes
-- Respect de la normalisation des données (pas de redondance inutile)
-
-#### 3. Opérations CRUD complètes
-- Au moins **une entité principale** avec les 4 opérations (Create, Read, Update, Delete)
-- Pagination des listes (`paginate()`)
-- Recherche et filtrage des données
-
-#### 4. Routage & Contrôleurs
-- Utilisation des **Resource Controllers** (`Route::resource`)
-- Séparation claire des routes web et API
-- Routes nommées (`route('nom.action')`)
-
-#### 5. Vues Blade
-- Utilisation des **layouts Blade** (`@extends`, `@section`, `@yield`)
-- Composants réutilisables (`@include`, `@component`)
-- Affichage conditionnel selon les rôles (`@can`, `@auth`, `@role`)
-
-#### 6. Validation des formulaires
-- Validation via **Requests** dédiés
-- Messages d'erreur personnalisés et affichés à l'utilisateur
-- Protection **CSRF** sur tous les formulaires (`@csrf`)
+**Dépendances PHP notables :** `laravel/reverb`, `laravel/socialite`, `barryvdh/laravel-dompdf`.
 
 ---
 
-### Niveau 2 — Intermédiaires *(obligatoires)*
+## Installation
 
-#### 7. Authentification multi-rôles
-- Au minimum **3 types d'utilisateurs** avec des rôles distincts, par exemple :
-  - `Administrateur` — accès total
-  - `Gestionnaire / Agent` — accès métier partiel
-  - `Client / Utilisateur` — accès restreint à son propre espace
-- Système de rôles implémenté
-- Redirection automatique selon le rôle après connexion
-- Protection des routes par rôle
+### Prérequis
 
-#### 8. Middleware personnalisés
-- Au moins **3 middleware** créés manuellement (ex: `CheckRole`, `CheckAccountActive`, `RateLimited`)
-- Middleware appliqué aux routes ou groupes de routes concernés
-- Explication claire du rôle de chaque middleware dans le README
+- PHP ≥ 8.3, Composer, Node.js ≥ 20, npm
+- Extension PHP : `pdo_sqlite` (ou driver MySQL/PostgreSQL)
 
-#### 9. Dashboard Administrateur
-- Tableau de bord dédié à l'administrateur avec :
-  - **Statistiques globales** (nombre d'utilisateurs, transactions, etc.)
-  - **Graphiques** (Chart.js ou autre)
-  - **Activité récente** (dernières inscriptions, actions, alertes)
-  - Gestion complète des utilisateurs (liste, activation/désactivation, suppression)
-  - Gestion des contenus ou entités principales de l'application
-
-#### 10. Mailing (Email)
-- Configuration d'un service d'envoi d'email (Mailtrap en dev, SMTP en prod)
-- Au moins **4 types d'emails** envoyés automatiquement :
-  - Email de bienvenue à l'inscription
-  - Email de confirmation d'une action importante (commande, paiement, etc.)
-  - Email de confirmation de l'adresse mail après création de compte
-  - Email de notification (alerte, changement de statut, etc.)
-- Utilisation des **Mailables** et des **templates Blade** pour les emails
-- Emails en file d'attente avec **Laravel Queues** (bonus apprécié)
-
-#### 11. Double Authentification (2FA)
-- Implémentation de la vérification en deux étapes :
-  - Envoi d'un **code OTP par email** à la connexion
-  - Saisie du code pour valider l'accès
-  - Expiration du code après un délai défini (5 à 10 minutes)
-- Option d'activation/désactivation du 2FA depuis le profil utilisateur
-
----
-
-### Niveau 3 — Avancés *(au moins 3 parmi les suivants)*
-
-#### 12. API REST
-- Endpoints RESTful documentés et fonctionnels
-- Authentification de l'API via **Laravel Sanctum** (tokens)
-- Réponses JSON standardisées (code HTTP, message, data)
-- Au moins 5 endpoints couvrant les opérations CRUD d'une entité
-
-#### 13. Upload & Gestion de fichiers
-- Upload sécurisé de fichiers (images, documents PDF)
-- Validation du type et de la taille du fichier
-- Stockage organisé dans `storage/app/public`
-- Génération de miniatures pour les images (bonus)
-
-#### 14. Notifications
-- Utilisation du système de **Notifications Laravel** (`php artisan make:notification`)
-- Notifications en base de données (cloche d'alertes dans l'interface)
-- Notifications par email déclenchées par des événements métier
-
-#### 15. Événements & Listeners (Facultatif)
-- Au moins **1 Event/Listener** implémenté (ex: `UserRegistered`, `PaymentCompleted`)
-- Découplage logique entre les actions et leurs conséquences
-
-#### 16. Paiement mobile intégré
-- Intégration **une API de paiement mobile** (M-Pesa, Airtel Money, Orange Money)
-- Workflow complet : initiation → confirmation → mise à jour du statut
-- Historique des transactions avec statuts (en attente, réussi, échoué)
-- Reçu de paiement généré automatiquement (PDF ou email)
-- Lien de la documentation de LabPay : [https://doc.api.labyrinthe-rdc.com/](https://doc.api.labyrinthe-rdc.com/)
-
-#### 17. Génération de PDF
-- Génération dynamique de documents PDF (factures, reçus, rapports, attestations)
-- Utilisation d'un package dédié (DomPDF, Snappy, etc.)
-- Téléchargement et/ou envoi par email du PDF
-
-#### 18. Recherche avancée & Filtres
-- Filtres combinés sur les listes (par date, statut, catégorie, etc.)
-- Barre de recherche avec résultats en temps réel (AJAX ou Livewire)
-
-#### 19. Logs & Traçabilité
-- Journalisation des actions sensibles (connexions, modifications, suppressions)
-- Interface d'administration pour consulter les logs
-- Utilisation de `Log::info()`, `Log::warning()` etc. de manière cohérente
-
-#### 20. Déploiement
-- Application déployée sur un serveur en ligne (Heroku, Railway, VPS, etc.)
-- Fichier `.env.example` fourni avec toutes les variables nécessaires
-- Base de données de production configurée
-
----
-
-## Base de données
-
-- Fournir le **schéma de la base de données** dans le dossier `docs/`
-- Toutes les tables doivent avoir des clés étrangères correctement définies
-- Les **seeders** doivent permettre de tester l'application immédiatement après installation
-
----
-
-## Documentation (README.md et fichier pdf)
-
-Le fichier README doit obligatoirement contenir :
-
-- [ ] Titre et description du projet
-- [ ] Nom de l'étudiant(e)
-- [ ] Technologies utilisées (Laravel version, PHP version, base de données, dépendances rajoutées)
-- [ ] Instructions d'installation pas à pas
-- [ ] Comptes de test (email + mot de passe pour chaque rôle)
-- [ ] Liste des fonctionnalités implémentées
-- [ ] Schéma de la base de données (image ou lien)
-- [ ] Difficultés rencontrées et solutions trouvées
-- [ ] Lien vers l'application déployée *(si applicable)*
-
----
-
-## Installation du projet
+### Étapes
 
 ```bash
 # 1. Cloner le dépôt
-git clone https://github.com/votre-username/nom-du-projet.git
-cd nom-du-projet
+git clone https://github.com/Kasereka27/kin-taxi-booking-exam.git
+cd kin-taxi-booking-exam
 
-# 2. Installer les dépendances
+# 2. Dépendances
 composer install
-npm install && npm run build
+npm install
 
-# 3. Configurer l'environnement
+# 3. Environnement
 cp .env.example .env
 php artisan key:generate
 
-# 4. Configurer la base de données dans le fichier .env
-# DB_DATABASE=nom_de_la_base
-# DB_USERNAME=root
-# DB_PASSWORD=
-
-# 5. Exécuter les migrations et les seeders
+# 4. Base de données (SQLite par défaut)
+touch database/database.sqlite   # si le fichier n'existe pas
 php artisan migrate --seed
 
-# 6. Lier le stockage public
+# 5. Stockage public (reçus PDF, avatars…)
 php artisan storage:link
 
-# 7. Lancer le serveur
-php artisan serve
+# 6. Build front-end
+npm run build
+
+# 7. Lancer l'environnement de développement
+composer run dev
 ```
+
+`composer run dev` démarre en parallèle : serveur HTTP, file d'attente, Reverb (WebSocket) et Vite.
+
+Application disponible sur **http://localhost:8000** (ou l'URL indiquée par `php artisan serve`).
+
+### Variables d'environnement importantes
+
+| Variable | Rôle |
+|----------|------|
+| `APP_NAME` | Nom affiché (ex. `KinTaxiBooking`) |
+| `VITE_GOOGLE_MAPS_API_KEY` | Carte + Directions API (Google Cloud) |
+| `VITE_MAP_PROVIDER` | `google` (défaut) ou `mapbox` |
+| `REVERB_*` | WebSocket suivi temps réel (port **8090** par défaut) |
+| `LABYRINTHE_TOKEN` | Paiement Mobile Money |
+| `GOOGLE_CLIENT_*` | Connexion OAuth Google (optionnel) |
+| `MAIL_*` | Envoi des e-mails (Mailtrap en dev) |
+| `QUEUE_CONNECTION` | `database` — requis pour e-mails/PDF en queue |
+
+Voir `.env.example` pour la liste complète.
 
 ---
 
 ## Comptes de test
 
-| Rôle | Email | Mot de passe |
-|------|-------|--------------|
-| Administrateur | admin@exemple.com | password |
-| Gestionnaire | gestionnaire@exemple.com | password |
-| Client | client@exemple.com | password |
+Créés automatiquement par `php artisan migrate --seed` :
 
-> Ces comptes doivent être créés automatiquement par les **Seeders**.
+| Rôle | E-mail | Mot de passe |
+|------|--------|--------------|
+| Administrateur | admin@exemple.com | `password` |
+| Chauffeur | chauffeur@exemple.com | `password` |
+| Client | client@exemple.com | `password` |
 
----
-
-## Grille d'évaluation
-
-| Critère | Points |
-|--------|--------|
-| Architecture MVC & Structure du code | 10 |
-| Base de données, Migrations & Relations Eloquent | 15 |
-| Authentification multi-rôles & Middleware | 15 |
-| Dashboard administrateur | 10 |
-| CRUD complet & Validation | 10 |
-| Mailing | 10 |
-| Double authentification (2FA) | 10 |
-| Fonctionnalités avancées (API, Paiement…) | 15 |
-| Documentation & Qualité du code | 5 |
-| **Total** | **100** |
+Le seeder génère aussi des courses, paiements et avis de démonstration.
 
 ---
 
-## Règles importantes
+## Fonctionnalités implémentées
 
-- Le projet doit être **individuel** sauf indication contraire du professeur
-- Tout plagiat ou copie de code entre étudiants entraînera la note de **0**
-- Le code doit être versionné sur **GitHub** (historique de commits exigé)
-- Un projet sans migrations (tables créées à la main) sera **pénalisé**
-- L'application doit fonctionner sans erreur au moment de la soutenance
+### Niveau 1 — Fondamentaux
+
+- Architecture **MVC** stricte, code organisé et testé
+- **Migrations**, relations Eloquent, **seeders** réalistes
+- **CRUD courses** (`rides`) : création, liste paginée, détail, annulation, suppression
+- Recherche et filtre par statut sur l'historique
+- **Resource routes**, routes nommées, layouts Blade réutilisables
+- Validation via **Form Requests**, protection **CSRF**
+
+### Niveau 2 — Intermédiaires
+
+- **Authentification multi-rôles** : `admin`, `driver`, `client` — redirection selon le rôle
+- **3 middleware personnalisés** :
+  - `CheckRole` — restriction par rôle (`role:admin`, etc.)
+  - `CheckAccountActive` — blocage des comptes désactivés
+  - `RedirectIfAuthenticated` — redirection des utilisateurs déjà connectés
+- **Dashboard administrateur** : statistiques, graphique Chart.js, courses live, gestion utilisateurs
+- **Mailing** (Mailables + queue) :
+  - Bienvenue à l'inscription
+  - Vérification d'e-mail
+  - Confirmation de réservation
+  - Notifications de statut (course acceptée / annulée)
+  - Confirmation de paiement (+ reçu PDF joint)
+- **Double authentification (2FA)** : code OTP par e-mail, expiration configurable, activation depuis le profil
+
+### Niveau 3 — Avancées
+
+- **Paiement mobile Labyrinthe** : initiation, callback, suivi, historique
+- **Notifications Laravel** : cloche in-app + e-mails métier
+- **Génération PDF** : reçu de paiement téléchargeable
+- **Suivi temps réel** : WebSocket (Reverb), carte Google Directions
+- **OAuth Google** (optionnel)
 
 ---
 
-## Calendrier
+## Schéma de base de données
 
-| Étape | Date limite |
-|-------|-------------|
-| Choix du sujet validé | À définir |
-| Remise du schéma de base de données | À définir |
-| Remise du projet complet (GitHub) | À définir |
-| Soutenance orale | À définir |
+Documentation détaillée : **[docs/database-schema.md](docs/database-schema.md)**
 
 ---
 
-*Document préparé par le corps enseignant de la FASI/UPC — Cours Laravel L3 · 2025–2026*
+## Tests
+
+```bash
+php artisan test --compact
+```
+
+**93 tests** Pest (features : auth, courses, paiement, notifications, 2FA, e-mails, PDF, suivi carte…).
+
+---
+
+## Middleware — rôle de chacun
+
+| Middleware | Fichier | Rôle |
+|------------|---------|------|
+| `role` | `CheckRole.php` | Autorise uniquement les rôles passés en paramètre de route |
+| `active` | `CheckAccountActive.php` | Déconnecte un utilisateur dont `is_active = false` |
+| `guest` | `RedirectIfAuthenticated.php` | Empêche un utilisateur connecté d'accéder à login/register |
+
+---
+
+## Difficultés rencontrées et solutions
+
+1. **Paiement Labyrinthe en local (Windows)** — Erreurs SSL avec le bundle CA local. Solution : `LABYRINTHE_VERIFY_SSL=false` en développement uniquement (jamais en production).
+
+2. **WebSocket Reverb** — Le port 8080 était déjà occupé sur Windows. Solution : utilisation du port **8090** (`REVERB_PORT` / `REVERB_SERVER_PORT`).
+
+3. **Carte de suivi** — Passage de tracés simulés à **Google Directions API** pour un itinéraire réaliste ; activation de l'API Directions dans Google Cloud Console.
+
+4. **E-mails et PDF en queue** — Les Mailables implémentent `ShouldQueue` ; la file d'attente doit tourner (`composer run dev` ou `php artisan queue:listen`).
+
+---
+
+## Déploiement
+
+Application non déployée en ligne au moment de la remise. Pour une mise en production :
+
+- Configurer MySQL/PostgreSQL, Redis (optionnel), SMTP, Reverb
+- `php artisan migrate --force`, `storage:link`, `npm run build`
+- Exposer le callback Labyrinthe : `POST /api/labyrinthe/callback`
+
+---
+
+## Structure du dépôt
+
+```
+kin-taxi-booking-exam/
+├── app/
+│   ├── Http/Controllers/
+│   ├── Http/Middleware/
+│   ├── Http/Requests/
+│   ├── Mail/
+│   ├── Models/
+│   ├── Notifications/
+│   ├── Policies/
+│   └── Services/
+├── database/migrations/
+├── database/seeders/
+├── docs/
+│   └── database-schema.md
+├── resources/views/
+├── routes/web.php
+├── routes/api.php
+├── tests/Feature/
+└── .env.example
+```
+
+---
+
+## Licence
+
+Projet académique — UPC/FASI · 2025–2026.
