@@ -7,9 +7,13 @@
         "dev": "vite"
     },
     "devDependencies": {
+        "@googlemaps/js-api-loader": "^2.1.1",
         "@tailwindcss/vite": "^4.3.1",
         "concurrently": "^9.0.1",
+        "laravel-echo": "^2.3.7",
         "laravel-vite-plugin": "^3.1",
+        "mapbox-gl": "^3.25.0",
+        "pusher-js": "^8.5.0",
         "tailwindcss": "^4.3.1",
         "vite": "^8.0.0"
     }

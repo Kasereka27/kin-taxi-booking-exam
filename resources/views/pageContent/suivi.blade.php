@@ -40,8 +40,9 @@
       @endif
 
       <div class="bg-ink text-white rounded-xl p-4 text-center mb-5">
-        <div class="text-sm text-gray-400">Arrivée estimée dans</div>
+        <div id="route-phase-label" class="text-sm text-gray-400">Arrivée estimée dans</div>
         <div><span id="eta-value" class="text-4xl font-black text-taxi">{{ $etaMinutes }}</span><span class="text-lg"> min</span></div>
+        <div id="route-distance" class="text-xs text-gray-400 mt-1"></div>
       </div>
 
       @if ($driver)
@@ -156,21 +157,18 @@
 @endif
 @endsection
 
-@section('footer')
-  @if ($ride)
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  @endif
-@endsection
-
 @if ($ride)
 @section('scripts')
 @php
   $trackingPayload = [
+      'rideId' => $ride->id,
       'pickup' => $ride->pickupCoordinates(),
       'dropoff' => $ride->dropoffCoordinates(),
       'driver' => $ride->driverCoordinates(),
       'status' => $ride->status,
       'animate' => $ride->status !== 'pending' && $ride->driver_id !== null,
+      'isDriver' => auth()->check() && auth()->id() === $ride->driver_id,
+      'trackingUrl' => route('rides.tracking', $ride),
   ];
 @endphp
 <script>

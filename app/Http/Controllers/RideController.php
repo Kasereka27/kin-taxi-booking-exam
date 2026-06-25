@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Notifications\NewRideAvailable;
 use App\Notifications\RideAccepted;
 use App\Notifications\RideCancelled;
+use App\Services\RideTrackingService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -118,6 +119,8 @@ class RideController extends Controller
 
         $ride->loadMissing('client');
         $ride->client?->notify(new RideAccepted($ride));
+
+        app(RideTrackingService::class)->initializeTracking($ride);
 
         return back()->with('status', 'Course acceptée. Bonne route !');
     }

@@ -46,4 +46,14 @@ class RidePolicy
     {
         return $ride->client_id === $user->id && $ride->isPayable();
     }
+
+    /**
+     * Mise à jour GPS par le chauffeur assigné pendant une course active.
+     */
+    public function track(User $user, Ride $ride): bool
+    {
+        return $user->isDriver()
+            && $ride->driver_id === $user->id
+            && $ride->isTrackable();
+    }
 }

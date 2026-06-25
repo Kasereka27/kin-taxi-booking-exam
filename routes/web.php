@@ -12,6 +12,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\RideController;
+use App\Http\Controllers\RideTrackingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -103,6 +104,7 @@ Route::middleware(['auth', 'active'])->group(function () {
 
     Route::resource('rides', RideController::class)->only(['index', 'store', 'show', 'destroy']);
     Route::patch('/rides/{ride}/cancel', [RideController::class, 'cancel'])->name('rides.cancel');
+    Route::patch('/rides/{ride}/tracking', [RideTrackingController::class, 'update'])->name('rides.tracking');
     Route::patch('/rides/{ride}/accept', [RideController::class, 'accept'])
         ->middleware('role:driver')
         ->name('rides.accept');
