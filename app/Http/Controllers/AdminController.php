@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
 use App\Models\DriverProfile;
 use App\Models\Payment;
 use App\Models\Ride;
 use App\Models\User;
+use App\Services\ActivityLogService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AdminController extends Controller
 {
+    public function __construct(private ActivityLogService $activityLogService) {}
+
     public function dashboard(): View
     {
         $today = today();
@@ -121,6 +125,44 @@ class AdminController extends Controller
 
         $label = $user->is_active ? 'réactivé' : 'bloqué';
 
+        $this->activityLogService->log(
+            $user->is_active ? ActivityLogService::ACTION_USER_REACTIVATED : ActivityLogService::ACTION_USER_BLOCKED,
+            "Compte de {$user->firstname} {$user->lastname} ({$user->email}) {$label} par un administrateur.",
+            $request->user(),
+            $request,
+        );
+
         return back()->with('status', "Le compte de {$user->firstname} {$user->lastname} a été {$label}.");
+    }
+
+    public function activityLogs(Request $request): View
+    {
+        $search = trim((string) $request->query('search', ''));
+        $action = (string) $request->query('action', '');
+
+        $logs = ActivityLog::query()
+            ->with('user')
+            ->when($action !== '', fn ($query) => $query->where('action', $action))
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('description', 'like', "%{$search}%")
+                        ->orWhere('action', 'like', "%{$search}%")
+                        ->orWhereHas('user', function ($userQuery) use ($search) {
+                            $userQuery->where('firstname', 'like', "%{$search}%")
+                                ->orWhere('lastname', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->latest()
+            ->paginate(8)
+            ->withQueryString();
+
+        return view('pageContent.adminActivityLogs', [
+            'logs' => $logs,
+            'search' => $search,
+            'action' => $action,
+            'actionLabels' => ActivityLogService::actionLabels(),
+        ]);
     }
 }

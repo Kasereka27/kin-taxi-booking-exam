@@ -14,9 +14,11 @@
   <section class="py-12">
     <div class="max-w-6xl mx-auto px-5 grid lg:grid-cols-[1.4fr_1fr] gap-6 items-start">
       <!-- Formulaire -->
-      <form method="POST" action="{{ route('rides.store') }}" class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200">
+      <form id="booking-form" method="POST" action="{{ route('rides.store') }}" class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200 overflow-visible">
         @csrf
         <h3 class="text-lg font-bold mb-4">Détails du trajet</h3>
+
+        <div data-address-alert class="hidden mb-4 px-4 py-3 rounded-lg text-sm bg-amber-100 text-amber-900 font-medium"></div>
 
         @if ($errors->any())
           <div class="mb-4 px-4 py-3 rounded-lg text-sm bg-red-100 text-red-700">
@@ -28,13 +30,25 @@
           </div>
         @endif
 
-        <div class="mb-4">
-          <label class="block font-semibold mb-1.5 text-sm">Adresse de départ</label>
-          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">📍</span><input id="pickup" name="pickup_addr" value="{{ old('pickup_addr', request('pickup_addr')) }}" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Ex : 12 av. de la Libération, Kinshasa" /></div>
+        <div class="mb-4" data-address-field="pickup">
+          <label class="block font-semibold mb-1.5 text-sm" for="pickup">Adresse de départ</label>
+          <p class="text-xs text-gray-500 mb-2">Commencez à taper, puis cliquez une suggestion Kinshasa.</p>
+          <div class="relative overflow-visible" data-address-input>
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10">📍</span>
+            <input id="pickup" name="pickup_addr" value="{{ old('pickup_addr', request('pickup_addr')) }}" required class="relative z-0 w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Ex : Gare Centrale, Kinshasa" />
+          </div>
+          <input type="hidden" id="pickup_lat" name="pickup_lat" value="{{ old('pickup_lat') }}">
+          <input type="hidden" id="pickup_lng" name="pickup_lng" value="{{ old('pickup_lng') }}">
         </div>
-        <div class="mb-4">
-          <label class="block font-semibold mb-1.5 text-sm">Adresse de destination</label>
-          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">🏁</span><input id="dropoff" name="dropoff_addr" value="{{ old('dropoff_addr', request('dropoff_addr')) }}" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Ex : Aéroport de N'djili" /></div>
+        <div class="mb-4" data-address-field="dropoff">
+          <label class="block font-semibold mb-1.5 text-sm" for="dropoff">Adresse de destination</label>
+          <p class="text-xs text-gray-500 mb-2">Cliquez une suggestion dans la liste — la saisie libre seule n'est pas acceptée.</p>
+          <div class="relative overflow-visible" data-address-input>
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10">🏁</span>
+            <input id="dropoff" name="dropoff_addr" value="{{ old('dropoff_addr', request('dropoff_addr')) }}" required class="relative z-0 w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Ex : Aéroport de N'djili" />
+          </div>
+          <input type="hidden" id="dropoff_lat" name="dropoff_lat" value="{{ old('dropoff_lat') }}">
+          <input type="hidden" id="dropoff_lng" name="dropoff_lng" value="{{ old('dropoff_lng') }}">
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div class="mb-4"><label class="block font-semibold mb-1.5 text-sm">Date</label><input type="date" name="date" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" /></div>
@@ -48,9 +62,9 @@
         <label class="block font-semibold mb-2">Type de véhicule</label>
         <input type="hidden" id="vehicleType" name="vehicleType" value="eco" />
         <div class="grid grid-cols-3 gap-3.5 mb-4">
-          <div class="car-option border-2 border-taxi bg-yellow-50 ring-2 ring-taxi rounded-xl p-4 text-center cursor-pointer transition" data-type="eco"><div class="text-3xl">🚗</div><div>Éco</div><div class="font-bold">dès 5 000 FC</div></div>
-          <div class="car-option border-2 border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:border-taxi transition" data-type="confort"><div class="text-3xl">🚙</div><div>Confort</div><div class="font-bold">dès 8 000 FC</div></div>
-          <div class="car-option border-2 border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:border-taxi transition" data-type="van"><div class="text-3xl">🚐</div><div>Van</div><div class="font-bold">dès 12 000 FC</div></div>
+          <div class="car-option border-2 border-taxi bg-yellow-50 ring-2 ring-taxi rounded-xl p-4 text-center cursor-pointer transition" data-type="eco"><div class="text-3xl">🚗</div><div>Éco</div><div class="font-bold">dès 2 000 FC</div></div>
+          <div class="car-option border-2 border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:border-taxi transition" data-type="confort"><div class="text-3xl">🚙</div><div>Confort</div><div class="font-bold">dès 3 500 FC</div></div>
+          <div class="car-option border-2 border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:border-taxi transition" data-type="van"><div class="text-3xl">🚐</div><div>Van</div><div class="font-bold">dès 5 000 FC</div></div>
         </div>
 
         <div class="mb-4">
@@ -79,6 +93,10 @@
       </aside>
     </div>
   </section>
+@endsection
+
+@section('scripts')
+  @vite('resources/js/booking.js')
 @endsection
 
 

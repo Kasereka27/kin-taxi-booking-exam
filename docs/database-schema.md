@@ -179,7 +179,7 @@ Codes à usage unique pour la double authentification (hashés, expiration + `us
 
 ### `activity_logs`
 
-Journal d'audit (structure prête ; alimentation optionnelle).
+Journal d'audit des actions importantes (connexion, courses, paiements, modération).
 
 ### `notifications`
 

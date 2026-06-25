@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Ride;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RideRequest extends FormRequest
@@ -16,9 +17,15 @@ class RideRequest extends FormRequest
      */
     public function rules(): array
     {
+        $bounds = Ride::kinshasaBounds();
+
         return [
             'pickup_addr' => ['required', 'string', 'max:255'],
+            'pickup_lat' => ['required', 'numeric', "between:{$bounds['lat_min']},{$bounds['lat_max']}"],
+            'pickup_lng' => ['required', 'numeric', "between:{$bounds['lng_min']},{$bounds['lng_max']}"],
             'dropoff_addr' => ['required', 'string', 'max:255'],
+            'dropoff_lat' => ['required', 'numeric', "between:{$bounds['lat_min']},{$bounds['lat_max']}"],
+            'dropoff_lng' => ['required', 'numeric', "between:{$bounds['lng_min']},{$bounds['lng_max']}"],
             'vehicle_type' => ['required', 'in:eco,confort,van'],
         ];
     }
@@ -31,6 +38,14 @@ class RideRequest extends FormRequest
         return [
             'pickup_addr.required' => 'L\'adresse de départ est obligatoire.',
             'dropoff_addr.required' => 'L\'adresse de destination est obligatoire.',
+            'pickup_lat.required' => 'Sélectionnez une adresse de départ dans la liste de suggestions (Kinshasa).',
+            'pickup_lng.required' => 'Sélectionnez une adresse de départ dans la liste de suggestions (Kinshasa).',
+            'dropoff_lat.required' => 'Sélectionnez une adresse de destination dans la liste de suggestions (Kinshasa).',
+            'dropoff_lng.required' => 'Sélectionnez une adresse de destination dans la liste de suggestions (Kinshasa).',
+            'pickup_lat.between' => 'L\'adresse de départ doit se situer dans la zone de Kinshasa.',
+            'pickup_lng.between' => 'L\'adresse de départ doit se situer dans la zone de Kinshasa.',
+            'dropoff_lat.between' => 'L\'adresse de destination doit se situer dans la zone de Kinshasa.',
+            'dropoff_lng.between' => 'L\'adresse de destination doit se situer dans la zone de Kinshasa.',
             'vehicle_type.required' => 'Veuillez choisir un type de véhicule.',
             'vehicle_type.in' => 'Le type de véhicule sélectionné est invalide.',
         ];

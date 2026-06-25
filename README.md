@@ -31,9 +31,10 @@ KinTaxiBooking permet à un **client** de réserver une course, de la payer via 
 | Paiement | API Labyrinthe RDC (M-Pesa, Airtel, Orange) |
 | PDF | DomPDF (`barryvdh/laravel-dompdf`) |
 | OAuth | Laravel Socialite (Google) |
-| Tests | Pest 4 (93 tests) |
+| API | Laravel Sanctum (tokens Bearer) |
+| Tests | Pest 4 |
 
-**Dépendances PHP notables :** `laravel/reverb`, `laravel/socialite`, `barryvdh/laravel-dompdf`.
+**Dépendances PHP notables :** `laravel/reverb`, `laravel/socialite`, `laravel/sanctum`, `barryvdh/laravel-dompdf`.
 
 ---
 
@@ -82,7 +83,7 @@ Application disponible sur **http://localhost:8000** (ou l'URL indiquée par `ph
 | Variable | Rôle |
 |----------|------|
 | `APP_NAME` | Nom affiché (ex. `KinTaxiBooking`) |
-| `VITE_GOOGLE_MAPS_API_KEY` | Carte + Directions API (Google Cloud) |
+| `VITE_GOOGLE_MAPS_API_KEY` | Carte, Directions et **Places** (autocomplétion adresses) |
 | `VITE_MAP_PROVIDER` | `google` (défaut) ou `mapbox` |
 | `REVERB_*` | WebSocket suivi temps réel (port **8090** par défaut) |
 | `LABYRINTHE_TOKEN` | Paiement Mobile Money |
@@ -142,12 +143,31 @@ Le seeder génère aussi des courses, paiements et avis de démonstration.
 - **Génération PDF** : reçu de paiement téléchargeable
 - **Suivi temps réel** : WebSocket (Reverb), carte Google Directions
 - **OAuth Google** (optionnel)
+- **API REST** : authentification Sanctum, CRUD courses, réponses JSON standardisées — voir **[docs/api.md](docs/api.md)**
+- **Journal d'activité admin** : traçabilité connexions, courses, paiements, modération utilisateurs
+
+---
+
+## API REST
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| `POST` | `/api/login` | Obtenir un token Bearer |
+| `POST` | `/api/logout` | Révoquer le token (auth) |
+| `GET` | `/api/user` | Profil connecté (auth) |
+| `GET` | `/api/rides` | Liste paginée (auth) |
+| `POST` | `/api/rides` | Créer une course (auth, client) |
+| `GET` | `/api/rides/{id}` | Détail (auth) |
+| `PATCH` | `/api/rides/{id}/cancel` | Annuler (auth) |
+| `DELETE` | `/api/rides/{id}` | Supprimer (auth) |
+
+Documentation complète : **[docs/api.md](docs/api.md)**
 
 ---
 
 ## Schéma de base de données
 
-Documentation détaillée : **[docs/database-schema.md](docs/database-schema.md)**
+Documentation détaillée : **[docs/database-schema.md](docs/database-schema.md)** · API : **[docs/api.md](docs/api.md)**
 
 ---
 
@@ -157,7 +177,7 @@ Documentation détaillée : **[docs/database-schema.md](docs/database-schema.md)
 php artisan test --compact
 ```
 
-**93 tests** Pest (features : auth, courses, paiement, notifications, 2FA, e-mails, PDF, suivi carte…).
+**115 tests** Pest (features : auth, courses, paiement, notifications, 2FA, e-mails, PDF, suivi carte, API REST, logs admin, adresses…).
 
 ---
 

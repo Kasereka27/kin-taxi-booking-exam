@@ -133,28 +133,31 @@ const API = {
   }
   
   /* ----- Estimateur de prix ----- */
-  const RATES = { eco: { base: 5000, km: 3000 }, confort: { base: 8000, km: 4500 }, van: { base: 12000, km: 6000 } };
-  
   function initEstimator() {
+    if (document.getElementById("booking-form")) {
+      return;
+    }
+
     ["pickup", "dropoff"].forEach((id) => {
       const el = document.getElementById(id);
       if (el) el.addEventListener("input", updateEstimate);
     });
     updateEstimate();
   }
-  
+
   function updateEstimate() {
     const out = document.getElementById("estimate");
     if (!out) return;
     const type = document.getElementById("vehicleType")?.value || "eco";
     const distance = 8 + Math.random() * 6; // distance simulée (km)
-    const r = RATES[type] || RATES.eco;
-    const price = Math.round(r.base + distance * r.km);
+    const price = estimateRidePrice(type, distance);
+    const rate = RIDE_RATES[type] ?? RIDE_RATES.eco;
     const eta = Math.round(distance * 1.8 + 3);
     const priceFc = price.toLocaleString("fr-FR") + " FC";
     out.innerHTML = `
       <div class="flex justify-between"><span class="text-gray-500">Distance estimée</span><strong>${distance.toFixed(1)} km</strong></div>
       <div class="flex justify-between"><span class="text-gray-500">Durée estimée</span><strong>${eta} min</strong></div>
+      <div class="flex justify-between text-sm text-gray-400"><span>Tarif</span><span>${rate.base.toLocaleString("fr-FR")} FC + ${rate.km.toLocaleString("fr-FR")} FC/km</span></div>
       <div class="flex justify-between text-xl mt-2"><span>Prix estimé</span><strong class="text-taxi-dark">${priceFc}</strong></div>`;
   }
   
@@ -174,4 +177,5 @@ const API = {
  * allow your team to quickly build robust real-time web applications.
  */
 
+import { estimateRidePrice, RIDE_RATES } from "./ride-rates.js";
 import './echo';

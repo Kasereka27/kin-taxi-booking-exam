@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\LoginRequest;
+use App\Services\ActivityLogService;
 use App\Services\TwoFactorService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -11,7 +12,10 @@ use Illuminate\View\View;
 
 class LoginController extends Controller
 {
-    public function __construct(private TwoFactorService $twoFactorService) {}
+    public function __construct(
+        private TwoFactorService $twoFactorService,
+        private ActivityLogService $activityLogService,
+    ) {}
 
     public function login(): View
     {
@@ -44,11 +48,29 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
+        $this->activityLogService->log(
+            ActivityLogService::ACTION_LOGIN,
+            'Connexion réussie via le formulaire web.',
+            $user,
+            $request,
+        );
+
         return redirect()->intended(route($user->dashboardRouteName()));
     }
 
     public function destroy(Request $request): RedirectResponse
     {
+        $user = $request->user();
+
+        if ($user !== null) {
+            $this->activityLogService->log(
+                ActivityLogService::ACTION_LOGOUT,
+                'Déconnexion depuis l\'application web.',
+                $user,
+                $request,
+            );
+        }
+
         Auth::logout();
 
         $request->session()->invalidate();

@@ -44,7 +44,14 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function validRideAddressPayload(array $overrides = []): array
 {
-    // ..
+    return array_merge([
+        'pickup_addr' => 'Gare Centrale, Kinshasa',
+        'pickup_lat' => -4.3217,
+        'pickup_lng' => 15.3125,
+        'dropoff_addr' => 'Aéroport de N\'djili, Kinshasa',
+        'dropoff_lat' => -4.3858,
+        'dropoff_lng' => 15.4446,
+    ], $overrides);
 }

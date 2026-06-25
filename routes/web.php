@@ -111,6 +111,7 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::get('/dashboard', 'dashboard')->name('dashboard');
             Route::get('/users', 'users')->name('users');
             Route::patch('/users/{user}/toggle-active', 'toggleUserActive')->name('users.toggle');
+            Route::get('/activity-logs', 'activityLogs')->name('activity-logs');
         });
 
     Route::controller(NotificationController::class)

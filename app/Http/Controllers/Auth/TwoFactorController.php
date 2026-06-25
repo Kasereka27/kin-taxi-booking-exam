@@ -4,13 +4,17 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\VerifyTwoFactorRequest;
+use App\Services\ActivityLogService;
 use App\Services\TwoFactorService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class TwoFactorController extends Controller
 {
-    public function __construct(private TwoFactorService $twoFactorService) {}
+    public function __construct(
+        private TwoFactorService $twoFactorService,
+        private ActivityLogService $activityLogService,
+    ) {}
 
     public function show(): View|RedirectResponse
     {
@@ -52,6 +56,13 @@ class TwoFactorController extends Controller
         }
 
         $request->session()->regenerate();
+
+        $this->activityLogService->log(
+            ActivityLogService::ACTION_LOGIN,
+            'Connexion réussie après vérification 2FA.',
+            $authenticatedUser,
+            $request,
+        );
 
         return redirect()->intended(route($authenticatedUser->dashboardRouteName()));
     }

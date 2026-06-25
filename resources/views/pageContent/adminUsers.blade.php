@@ -17,7 +17,7 @@
       <nav class="flex lg:flex-col gap-1 flex-1">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">📊 <span class="hidden lg:inline">Vue d'ensemble</span></a>
         <a href="{{ route('admin.users') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap bg-taxi text-ink">👥 <span class="hidden lg:inline">Utilisateurs</span></a>
-        <a href="{{ route('admin.users', ['role' => 'driver']) }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🧑‍✈️ <span class="hidden lg:inline">Chauffeurs</span></a>
+        <a href="{{ route('admin.activity-logs') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">📋 <span class="hidden lg:inline">Journal d'activité</span></a>
       </nav>
       <div class="hidden lg:block border-t border-gray-800 pt-4 mt-4">
         <form method="POST" action="{{ route('logout') }}">

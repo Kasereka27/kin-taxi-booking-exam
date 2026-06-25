@@ -61,8 +61,7 @@ it('notifie les chauffeurs en ligne d’une nouvelle course', function () {
 
     $this->actingAs($client)
         ->post(route('rides.store'), [
-            'pickup_addr' => 'Gare Centrale, Kinshasa',
-            'dropoff_addr' => 'Aéroport de N’djili, Kinshasa',
+            ...validRideAddressPayload(),
             'vehicle_type' => 'eco',
         ])
         ->assertRedirect();

@@ -15,8 +15,8 @@
     <div class="max-w-6xl mx-auto px-5 grid md:grid-cols-3 gap-6 items-center">
       <div class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200 text-center">
         <h3 class="text-lg font-bold">Éco 🚗</h3>
-        <div class="text-5xl font-black mt-3">5 000 FC <span class="text-base text-gray-500 font-medium">/ prise en charge</span></div>
-        <p class="text-gray-500">+ 3 000 FC / km</p>
+        <div class="text-5xl font-black mt-3">2 000 FC <span class="text-base text-gray-500 font-medium">/ prise en charge</span></div>
+        <p class="text-gray-500">+ 800 FC / km</p>
         <ul class="my-6 text-left">
           <li class="flex gap-2.5 py-2 border-b border-gray-100">✓ 1 à 4 passagers</li>
           <li class="flex gap-2.5 py-2 border-b border-gray-100">✓ Suivi en temps réel</li>
@@ -28,8 +28,8 @@
       <div class="relative bg-white rounded-2xl p-7 shadow-lg2 border-2 border-taxi text-center scale-105">
         <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-taxi text-ink px-4.5 py-1.5 rounded-full text-xs font-extrabold px-5">Le plus choisi</div>
         <h3 class="text-lg font-bold">Confort 🚙</h3>
-        <div class="text-5xl font-black mt-3">8 000 FC <span class="text-base text-gray-500 font-medium">/ prise en charge</span></div>
-        <p class="text-gray-500">+ 4 500 FC / km</p>
+        <div class="text-5xl font-black mt-3">3 500 FC <span class="text-base text-gray-500 font-medium">/ prise en charge</span></div>
+        <p class="text-gray-500">+ 1 200 FC / km</p>
         <ul class="my-6 text-left">
           <li class="flex gap-2.5 py-2 border-b border-gray-100">✓ Véhicule haut de gamme</li>
           <li class="flex gap-2.5 py-2 border-b border-gray-100">✓ Eau & chargeurs offerts</li>
@@ -40,8 +40,8 @@
       </div>
       <div class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200 text-center">
         <h3 class="text-lg font-bold">Van 🚐</h3>
-        <div class="text-5xl font-black mt-3">12 000 FC <span class="text-base text-gray-500 font-medium">/ prise en charge</span></div>
-        <p class="text-gray-500">+ 6 000 FC / km</p>
+        <div class="text-5xl font-black mt-3">5 000 FC <span class="text-base text-gray-500 font-medium">/ prise en charge</span></div>
+        <p class="text-gray-500">+ 1 800 FC / km</p>
         <ul class="my-6 text-left">
           <li class="flex gap-2.5 py-2 border-b border-gray-100">✓ Jusqu'à 7 passagers</li>
           <li class="flex gap-2.5 py-2 border-b border-gray-100">✓ Grands bagages</li>

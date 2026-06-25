@@ -247,8 +247,20 @@ class LabyrinthePaymentService
 
             $client->notify(new PaymentSucceeded($payment));
             Mail::to($client)->queue(new PaymentConfirmedMail($payment));
+
+            app(ActivityLogService::class)->log(
+                ActivityLogService::ACTION_PAYMENT_SUCCESS,
+                'Paiement '.$payment->order_number.' confirmé pour la course '.Ride::referenceFor($payment->ride_id).'.',
+                $client,
+            );
         } elseif ($payment->status === 'failed') {
             $client->notify(new PaymentFailed($payment));
+
+            app(ActivityLogService::class)->log(
+                ActivityLogService::ACTION_PAYMENT_FAILED,
+                'Paiement '.$payment->order_number.' refusé pour la course '.Ride::referenceFor($payment->ride_id).'.',
+                $client,
+            );
         }
     }
 

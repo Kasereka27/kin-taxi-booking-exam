@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\NewRideAvailable;
 use App\Notifications\RideAccepted;
 use App\Notifications\RideCancelled;
+use App\Services\ActivityLogService;
 use App\Services\RideTrackingService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -56,11 +57,20 @@ class RideController extends Controller
     {
         $validated = $request->validated();
 
-        $distance = round(random_int(20, 250) / 10, 2);
+        $distance = Ride::distanceKmBetween(
+            (float) $validated['pickup_lat'],
+            (float) $validated['pickup_lng'],
+            (float) $validated['dropoff_lat'],
+            (float) $validated['dropoff_lng'],
+        );
 
         $ride = $request->user()->ridesAsClient()->create([
             'pickup_addr' => $validated['pickup_addr'],
+            'pickup_lat' => $validated['pickup_lat'],
+            'pickup_lng' => $validated['pickup_lng'],
             'dropoff_addr' => $validated['dropoff_addr'],
+            'dropoff_lat' => $validated['dropoff_lat'],
+            'dropoff_lng' => $validated['dropoff_lng'],
             'vehicle_type' => $validated['vehicle_type'],
             'status' => 'pending',
             'distance_km' => $distance,
@@ -74,6 +84,13 @@ class RideController extends Controller
         Notification::send($onlineDrivers, new NewRideAvailable($ride));
 
         Mail::to($request->user())->queue(new RideBookedMail($ride));
+
+        app(ActivityLogService::class)->log(
+            ActivityLogService::ACTION_RIDE_CREATED,
+            'Course '.Ride::referenceFor($ride->id)." : {$ride->pickup_addr} → {$ride->dropoff_addr}.",
+            $request->user(),
+            $request,
+        );
 
         return redirect()
             ->route('user.dashboardClient')
@@ -131,6 +148,13 @@ class RideController extends Controller
 
         app(RideTrackingService::class)->initializeTracking($ride);
 
+        app(ActivityLogService::class)->log(
+            ActivityLogService::ACTION_RIDE_ACCEPTED,
+            'Course '.Ride::referenceFor($ride->id).' acceptée par le chauffeur.',
+            $driver,
+            $request,
+        );
+
         return back()->with('status', 'Course acceptée. Bonne route !');
     }
 
@@ -157,6 +181,13 @@ class RideController extends Controller
         foreach ($recipients as $recipient) {
             Mail::to($recipient)->queue(new RideStatusMail($ride, 'cancelled', $actor));
         }
+
+        app(ActivityLogService::class)->log(
+            ActivityLogService::ACTION_RIDE_CANCELLED,
+            'Course '.Ride::referenceFor($ride->id).' annulée.',
+            $actor,
+            $request,
+        );
 
         return redirect()
             ->back(fallback: route('rides.index'))

@@ -17,9 +17,9 @@ class Ride extends Model
      * @var array<string, array{0: int, 1: int}>
      */
     public const RATES = [
-        'eco' => [5000, 3000],
-        'confort' => [8000, 4500],
-        'van' => [12000, 6000],
+        'eco' => [2000, 800],
+        'confort' => [3500, 1200],
+        'van' => [5000, 1800],
     ];
 
     /** @var list<string> */
@@ -66,6 +66,40 @@ class Ride extends Model
         [$base, $perKm] = self::RATES[$vehicleType] ?? self::RATES['eco'];
 
         return (float) round($base + $distanceKm * $perKm);
+    }
+
+    /**
+     * @return array{lat_min: float, lat_max: float, lng_min: float, lng_max: float}
+     */
+    public static function kinshasaBounds(): array
+    {
+        return [
+            'lat_min' => -4.6,
+            'lat_max' => -4.2,
+            'lng_min' => 15.0,
+            'lng_max' => 15.6,
+        ];
+    }
+
+    public static function isWithinKinshasa(float $lat, float $lng): bool
+    {
+        $bounds = self::kinshasaBounds();
+
+        return $lat >= $bounds['lat_min']
+            && $lat <= $bounds['lat_max']
+            && $lng >= $bounds['lng_min']
+            && $lng <= $bounds['lng_max'];
+    }
+
+    public static function distanceKmBetween(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $earthRadius = 6371.0;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+        $a = sin($dLat / 2) ** 2
+            + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
+
+        return round($earthRadius * 2 * atan2(sqrt($a), sqrt(1 - $a)), 2);
     }
 
     /**

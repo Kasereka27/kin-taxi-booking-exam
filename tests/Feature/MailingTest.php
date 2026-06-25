@@ -79,8 +79,7 @@ it('envoie un e-mail de confirmation lors de la réservation d une course', func
     $client = User::factory()->create();
 
     $this->actingAs($client)->post(route('rides.store'), [
-        'pickup_addr' => 'Gare Centrale, Kinshasa',
-        'dropoff_addr' => 'Aéroport de N\'djili',
+        ...validRideAddressPayload(),
         'vehicle_type' => 'eco',
     ])->assertRedirect();
 
