@@ -27,7 +27,7 @@ class RideController extends Controller
         $user = $request->user();
 
         $rides = Ride::query()
-            ->with(['client', 'driver'])
+            ->with(['client', 'driver', 'payments' => fn ($query) => $query->where('status', 'success')->latest('paid_at')])
             ->when($user->isClient(), fn ($query) => $query->where('client_id', $user->id))
             ->when($user->isDriver(), fn ($query) => $query->where('driver_id', $user->id))
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))

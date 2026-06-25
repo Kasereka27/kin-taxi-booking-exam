@@ -242,6 +242,9 @@ class LabyrinthePaymentService
         }
 
         if ($payment->status === 'success') {
+            app(PaymentReceiptService::class)->generate($payment->fresh());
+            $payment->refresh();
+
             $client->notify(new PaymentSucceeded($payment));
             Mail::to($client)->queue(new PaymentConfirmedMail($payment));
         } elseif ($payment->status === 'failed') {

@@ -5,14 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\Ride;
 use App\Services\LabyrinthePaymentService;
+use App\Services\PaymentReceiptService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class PaymentController extends Controller
 {
-    public function __construct(private readonly LabyrinthePaymentService $paymentService) {}
+    public function __construct(
+        private readonly LabyrinthePaymentService $paymentService,
+        private readonly PaymentReceiptService $receiptService,
+    ) {}
 
     /**
      * Formulaire de paiement Mobile Money d'une course terminée.
@@ -94,5 +99,12 @@ class PaymentController extends Controller
         }
 
         return response()->json(['status' => $payment->status]);
+    }
+
+    public function receipt(Request $request, Payment $payment): Response
+    {
+        $this->authorize('viewReceipt', $payment);
+
+        return $this->receiptService->download($payment);
     }
 }

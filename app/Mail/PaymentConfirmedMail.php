@@ -42,6 +42,14 @@ class PaymentConfirmedMail extends Mailable implements ShouldQueue
      */
     public function attachments(): array
     {
-        return [];
+        if (! $this->payment->receipt_path) {
+            return [];
+        }
+
+        return [
+            Attachment::fromStorageDisk('public', $this->payment->receipt_path)
+                ->as('recu-'.Ride::referenceFor($this->payment->ride_id).'.pdf')
+                ->withMime('application/pdf'),
+        ];
     }
 }

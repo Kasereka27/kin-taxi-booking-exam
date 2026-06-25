@@ -41,8 +41,11 @@
         </div>
         <a href="{{ route('payments.status', $payment) }}" class="mt-5 inline-flex px-6 py-3 rounded-full font-bold border-2 border-gray-300 hover:border-ink transition">Rafraîchir maintenant</a>
       @elseif ($payment->isSuccessful())
-        <p class="text-gray-500 text-sm mt-5">Merci ! Votre course est réglée.</p>
-        <a href="{{ route('rides.show', $payment->ride_id) }}" class="mt-5 inline-flex px-6 py-3 rounded-full font-bold bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition">Voir la course</a>
+        <p class="text-gray-500 text-sm mt-5">Merci ! Votre course est réglée. Votre reçu PDF est disponible ci-dessous.</p>
+        <div class="mt-5 flex flex-col sm:flex-row gap-3 justify-center">
+          <a href="{{ route('payments.receipt', $payment) }}" class="inline-flex px-6 py-3 rounded-full font-bold border-2 border-gray-300 hover:border-ink hover:bg-ink hover:text-white transition">Télécharger le reçu PDF</a>
+          <a href="{{ route('rides.show', $payment->ride_id) }}" class="inline-flex px-6 py-3 rounded-full font-bold bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition">Voir la course</a>
+        </div>
       @else
         <p class="text-gray-600 text-sm mt-5">{{ $failureMessage }} Vous pouvez réessayer.</p>
         <a href="{{ route('rides.pay', $payment->ride_id) }}" class="mt-5 inline-flex px-6 py-3 rounded-full font-bold bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition">Réessayer le paiement</a>

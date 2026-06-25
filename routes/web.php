@@ -134,5 +134,6 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::post('/rides/{ride}/pay', [PaymentController::class, 'store'])->name('rides.pay.store');
         Route::get('/payments/{payment}/status', [PaymentController::class, 'status'])->name('payments.status');
         Route::get('/payments/{payment}/poll', [PaymentController::class, 'poll'])->name('payments.poll');
+        Route::get('/payments/{payment}/receipt', [PaymentController::class, 'receipt'])->name('payments.receipt');
     });
 });

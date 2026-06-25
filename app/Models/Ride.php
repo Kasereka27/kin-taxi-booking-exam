@@ -96,6 +96,14 @@ class Ride extends Model
         return $this->payments()->where('status', 'success')->exists();
     }
 
+    public function successfulPayment(): ?Payment
+    {
+        return $this->payments()
+            ->where('status', 'success')
+            ->latest('paid_at')
+            ->first();
+    }
+
     /**
      * Indique si la course est éligible à un paiement (terminée et non encore réglée).
      */

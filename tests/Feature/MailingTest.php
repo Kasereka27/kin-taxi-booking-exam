@@ -9,8 +9,8 @@ use App\Models\Payment;
 use App\Models\Ride;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Laravel\Socialite\Contracts\Factory;
 use Laravel\Socialite\Contracts\Provider;
@@ -127,6 +127,7 @@ it('envoie un e-mail de notification quand une course est annulée', function ()
 
 it('envoie un e-mail de confirmation de paiement réussi', function () {
     Mail::fake();
+    Storage::fake('public');
 
     $client = User::factory()->create();
     $ride = Ride::factory()->create(['client_id' => $client->id, 'status' => 'completed']);
@@ -145,7 +146,11 @@ it('envoie un e-mail de confirmation de paiement réussi', function () {
         'results' => ['status' => ['code' => 2, 'name' => 'Success']],
     ])->assertOk();
 
-    Mail::assertQueued(PaymentConfirmedMail::class, fn (PaymentConfirmedMail $mail) => $mail->payment->order_number === 'DEP-MAIL-OK');
+    $payment = Payment::where('order_number', 'DEP-MAIL-OK')->firstOrFail();
+
+    Mail::assertQueued(PaymentConfirmedMail::class, function (PaymentConfirmedMail $mail) use ($payment) {
+        return $mail->payment->is($payment) && $mail->payment->receipt_path !== null;
+    });
 });
 
 it('permet de renvoyer l e-mail de vérification depuis le profil', function () {

@@ -61,8 +61,11 @@
                 <span class="inline-flex px-3 py-1 rounded-full text-xs font-bold {{ $cls }}">{{ $ride->statusLabel() }}</span>
               </td>
               <td class="px-4 py-3.5">
-                <div class="flex gap-2">
+                <div class="flex flex-wrap gap-2">
                   <a href="{{ route('rides.show', $ride) }}" class="inline-flex px-3 py-1.5 rounded-full text-xs font-bold border-2 border-gray-300 hover:border-ink transition">Voir</a>
+                  @if ($ride->status === 'completed' && ($receipt = $ride->payments->first()))
+                    <a href="{{ route('payments.receipt', $receipt) }}" class="inline-flex px-3 py-1.5 rounded-full text-xs font-bold bg-ink text-white hover:bg-ink-soft transition">Reçu PDF</a>
+                  @endif
                   @can('update', $ride)
                     @if ($ride->status === 'pending')
                       <form method="POST" action="{{ route('rides.cancel', $ride) }}" onsubmit="return confirm('Annuler cette course ?');">

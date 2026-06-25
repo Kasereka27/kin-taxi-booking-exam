@@ -52,7 +52,11 @@
       @if ($ride->status === 'completed')
         <div class="mt-7 pt-6 border-t border-gray-200 flex items-center justify-between flex-wrap gap-3">
           @if ($ride->isPaid())
+            @php($receiptPayment = $ride->successfulPayment())
             <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">✅ Course payée</span>
+            @if ($receiptPayment)
+              <a href="{{ route('payments.receipt', $receiptPayment) }}" class="inline-flex px-5 py-2.5 rounded-full font-bold border-2 border-gray-300 hover:border-ink hover:bg-ink hover:text-white transition">Télécharger le reçu PDF</a>
+            @endif
           @else
             <span class="text-gray-500 text-sm">Cette course n'est pas encore réglée.</span>
             @can('pay', $ride)
