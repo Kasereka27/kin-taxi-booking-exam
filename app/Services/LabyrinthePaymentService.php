@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Mail\PaymentConfirmedMail;
 use App\Models\Payment;
 use App\Models\Ride;
 use App\Models\User;
@@ -10,6 +11,7 @@ use App\Notifications\PaymentSucceeded;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -241,6 +243,7 @@ class LabyrinthePaymentService
 
         if ($payment->status === 'success') {
             $client->notify(new PaymentSucceeded($payment));
+            Mail::to($client)->queue(new PaymentConfirmedMail($payment));
         } elseif ($payment->status === 'failed') {
             $client->notify(new PaymentFailed($payment));
         }

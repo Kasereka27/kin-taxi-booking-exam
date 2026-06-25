@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\RideRequest;
+use App\Mail\RideBookedMail;
+use App\Mail\RideStatusMail;
 use App\Models\Ride;
 use App\Models\User;
 use App\Notifications\NewRideAvailable;
@@ -12,6 +14,7 @@ use App\Services\RideTrackingService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 
 class RideController extends Controller
@@ -70,6 +73,8 @@ class RideController extends Controller
             ->get();
         Notification::send($onlineDrivers, new NewRideAvailable($ride));
 
+        Mail::to($request->user())->queue(new RideBookedMail($ride));
+
         return redirect()
             ->route('user.dashboardClient')
             ->with('success', 'Votre course a été enregistrée. Recherche d\'un chauffeur en cours…');
@@ -120,6 +125,10 @@ class RideController extends Controller
         $ride->loadMissing('client');
         $ride->client?->notify(new RideAccepted($ride));
 
+        if ($ride->client) {
+            Mail::to($ride->client)->queue(new RideStatusMail($ride, 'accepted'));
+        }
+
         app(RideTrackingService::class)->initializeTracking($ride);
 
         return back()->with('status', 'Course acceptée. Bonne route !');
@@ -143,6 +152,11 @@ class RideController extends Controller
             ->filter()
             ->reject(fn (User $user) => $user->id === $actor->id);
         Notification::send($recipients, new RideCancelled($ride, $actor));
+
+        $ride->refresh();
+        foreach ($recipients as $recipient) {
+            Mail::to($recipient)->queue(new RideStatusMail($ride, 'cancelled', $actor));
+        }
 
         return redirect()
             ->back(fallback: route('rides.index'))

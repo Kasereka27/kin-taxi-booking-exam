@@ -7,7 +7,6 @@ use App\Models\Ride;
 use App\Support\Money;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class PaymentSucceeded extends Notification implements ShouldQueue
@@ -21,17 +20,7 @@ class PaymentSucceeded extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
-    }
-
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->subject('Paiement confirmé')
-            ->greeting('Bonjour '.$notifiable->firstname.',')
-            ->line('Votre paiement de '.Money::fc($this->payment->amount).' pour la course #'.Ride::referenceFor($this->payment->ride_id).' a bien été confirmé.')
-            ->action('Voir la course', route('rides.show', $this->payment->ride_id))
-            ->salutation('Merci de votre confiance, l’équipe '.config('app.name'));
+        return ['database'];
     }
 
     /**

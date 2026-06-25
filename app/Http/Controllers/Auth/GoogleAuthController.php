@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeMail;
 use App\Models\User;
 use App\Services\TwoFactorService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
@@ -80,7 +82,7 @@ class GoogleAuthController extends Controller
 
         [$firstname, $lastname] = $this->splitName($googleUser->getName());
 
-        return User::query()->create([
+        $user = User::query()->create([
             'firstname' => $firstname,
             'lastname' => $lastname,
             'email' => $googleUser->getEmail(),
@@ -90,6 +92,10 @@ class GoogleAuthController extends Controller
             'is_active' => true,
             'email_verified_at' => now(),
         ]);
+
+        Mail::to($user)->queue(new WelcomeMail($user));
+
+        return $user;
     }
 
     /**

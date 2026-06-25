@@ -6,7 +6,6 @@ use App\Models\Ride;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
 class RideCancelled extends Notification implements ShouldQueue
@@ -20,18 +19,7 @@ class RideCancelled extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
-    }
-
-    public function toMail(object $notifiable): MailMessage
-    {
-        return (new MailMessage)
-            ->subject('Course annulée')
-            ->greeting('Bonjour '.$notifiable->firstname.',')
-            ->line('La course #'.$this->ride->reference().' a été annulée par '.$this->actorLabel().'.')
-            ->line('Trajet : '.$this->ride->pickup_addr.' → '.$this->ride->dropoff_addr.'.')
-            ->action('Voir mes courses', route('rides.index'))
-            ->salutation('L’équipe '.config('app.name'));
+        return ['database'];
     }
 
     /**

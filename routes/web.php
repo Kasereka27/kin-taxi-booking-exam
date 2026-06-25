@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -72,6 +73,16 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware(['auth', 'active'])->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
+
+    Route::controller(EmailVerificationController::class)->group(function () {
+        Route::get('/email/verify', 'notice')->name('verification.notice');
+        Route::get('/email/verify/{id}/{hash}', 'verify')
+            ->middleware(['signed', 'throttle:6,1'])
+            ->name('verification.verify');
+        Route::post('/email/verification-notification', 'send')
+            ->middleware('throttle:6,1')
+            ->name('verification.send');
+    });
 
     Route::controller(ProfileController::class)->prefix('profile')->name('profile.')->group(function () {
         Route::get('/', 'edit')->name('edit');

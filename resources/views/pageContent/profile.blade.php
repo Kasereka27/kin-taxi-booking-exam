@@ -17,6 +17,13 @@
       <div class="px-4 py-3 rounded-xl text-sm bg-green-100 text-green-800 font-semibold">{{ session('success') }}</div>
     @endif
 
+    @if (! $user->hasVerifiedEmail())
+      <div class="px-4 py-3 rounded-xl text-sm bg-yellow-100 text-yellow-900 font-semibold flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <span>Votre adresse e-mail n'est pas encore confirmée.</span>
+        <a href="{{ route('verification.notice') }}" class="inline-flex px-4 py-2 rounded-full bg-ink text-white text-xs font-bold">Confirmer mon e-mail</a>
+      </div>
+    @endif
+
     <div class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200">
       <div class="flex items-center gap-4 mb-6">
         <div class="w-16 h-16 rounded-full bg-taxi grid place-items-center font-extrabold text-2xl text-ink">

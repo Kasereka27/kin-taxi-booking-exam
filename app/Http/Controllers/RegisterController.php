@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Mail\WelcomeMail;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class RegisterController extends Controller
@@ -27,6 +30,9 @@ class RegisterController extends Controller
             'role' => $validated['role'],
             'password' => $validated['password'],
         ]);
+
+        event(new Registered($user));
+        Mail::to($user)->queue(new WelcomeMail($user));
 
         Auth::login($user);
 
