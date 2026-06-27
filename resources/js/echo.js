@@ -6,6 +6,16 @@ window.Pusher = Pusher;
 /**
  * Initialise Laravel Echo (Reverb) si les variables Vite sont présentes.
  */
+export function resolveReverbHost() {
+  const configured = import.meta.env.VITE_REVERB_HOST;
+
+  if (!configured || configured === "localhost" || configured === "127.0.0.1") {
+    return window.location.hostname;
+  }
+
+  return configured;
+}
+
 export function createEcho() {
   const key = import.meta.env.VITE_REVERB_APP_KEY;
 
@@ -19,7 +29,7 @@ export function createEcho() {
   return new Echo({
     broadcaster: "reverb",
     key,
-    wsHost: import.meta.env.VITE_REVERB_HOST ?? window.location.hostname,
+    wsHost: resolveReverbHost(),
     wsPort: port,
     wssPort: port,
     forceTLS: scheme === "https",

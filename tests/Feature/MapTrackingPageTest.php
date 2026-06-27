@@ -26,5 +26,18 @@ it('expose les variables carte dans la page suivi', function () {
         ->get(route('suivi.ride', $ride))
         ->assertOk()
         ->assertSee('trackingRide', false)
-        ->assertSee((string) $ride->id);
+        ->assertSee((string) $ride->id)
+        ->assertSee('Autoriser le suivi GPS')
+        ->assertSee('tracking-consent-modal', false)
+        ->assertSee('politique de confidentialité');
+});
+
+it('n\'affiche pas la modale de consentement sans chauffeur assigné', function () {
+    $client = User::factory()->create();
+    $ride = Ride::factory()->pending()->create(['client_id' => $client->id]);
+
+    $this->actingAs($client)
+        ->get(route('suivi.ride', $ride))
+        ->assertOk()
+        ->assertDontSee('Autoriser le suivi GPS');
 });

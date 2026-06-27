@@ -26,18 +26,48 @@
         ? strtoupper(substr($driver->firstname, 0, 1).substr($driver->lastname, 0, 1))
         : '—';
   @endphp
+  @if ($ride->status !== 'pending' && $ride->driver_id)
+    <div id="tracking-consent-modal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm hidden" role="dialog" aria-modal="true" aria-labelledby="tracking-consent-title" aria-hidden="true">
+      <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-200 p-6 sm:p-8">
+        <div class="flex justify-center mb-4 text-taxi-dark">
+          <x-icon name="map-pin" class="w-12 h-12" />
+        </div>
+        <h2 id="tracking-consent-title" class="text-xl font-extrabold text-center mb-3">Autoriser le suivi GPS</h2>
+        <p id="tracking-consent-message" class="text-sm text-gray-600 text-center leading-relaxed mb-4"></p>
+        <p class="text-xs text-gray-500 text-center mb-6">
+          En savoir plus dans notre
+          <a href="{{ route('legal.privacy') }}" class="font-semibold text-ink underline" target="_blank" rel="noopener">politique de confidentialité</a>.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <button type="button" id="tracking-consent-decline" class="flex-1 px-5 py-3 rounded-full font-bold border-2 border-gray-300 hover:border-ink transition">
+            Refuser
+          </button>
+          <button type="button" id="tracking-consent-accept" class="flex-1 px-5 py-3 rounded-full font-bold bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition">
+            Autoriser
+          </button>
+        </div>
+      </div>
+    </div>
+  @endif
   <div class="grid lg:grid-cols-[1fr_380px] lg:h-[calc(100vh-72px)]">
     <div id="map" class="w-full h-[50vh] lg:h-full bg-gray-200 z-0"></div>
 
     <aside class="bg-white border-l border-gray-200 p-5 sm:p-7 overflow-y-auto">
-      <div class="flex justify-between items-center mb-4">
+      <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
         <h2 class="text-xl font-bold">Course <span class="text-gray-500">#{{ $ride->reference() }}</span></h2>
-        <span id="ride-status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold {{ $statusStyles[1] }}">{{ $statusStyles[0] }}</span>
+        <div class="flex items-center gap-2 flex-wrap">
+          <span id="tracking-live-status" class="hidden inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700"></span>
+          <span id="ride-status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold {{ $statusStyles[1] }}">{{ $statusStyles[0] }}</span>
+        </div>
       </div>
 
       @if (session('success'))
         <div class="mb-4 px-4 py-3 rounded-xl bg-green-100 text-green-800 text-sm font-semibold">{{ session('success') }}</div>
       @endif
+
+      <div id="tracking-consent-declined" class="hidden mb-4 px-4 py-3 rounded-xl bg-amber-50 text-amber-900 text-sm font-semibold border border-amber-200">
+        Suivi en direct désactivé. Rechargez la page pour modifier votre choix ou autorisez la localisation dans les paramètres de votre navigateur.
+      </div>
 
       <div class="bg-ink text-white rounded-xl p-4 text-center mb-5">
         <div id="route-phase-label" class="text-sm text-gray-400">Arrivée estimée dans</div>
@@ -169,6 +199,7 @@
       'animate' => $ride->status !== 'pending' && $ride->driver_id !== null,
       'isDriver' => auth()->check() && auth()->id() === $ride->driver_id,
       'trackingUrl' => route('rides.tracking', $ride),
+      'trackingShowUrl' => route('rides.tracking.show', $ride),
   ];
 @endphp
 <script>

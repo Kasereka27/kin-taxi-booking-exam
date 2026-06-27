@@ -9,7 +9,7 @@ function toLngLat([lat, lng]) {
 }
 
 
-export function initMapboxTracking(container) {
+export function initMapboxTracking(container, trackingEnabled = true) {
   const token = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
   if (!token) {
@@ -19,7 +19,7 @@ export function initMapboxTracking(container) {
 
   mapboxgl.accessToken = token;
 
-  const tracking = readTrackingData();
+  const tracking = readTrackingData(trackingEnabled);
   const style =
     import.meta.env.VITE_MAPBOX_STYLE ?? "mapbox://styles/mapbox/streets-v12";
 

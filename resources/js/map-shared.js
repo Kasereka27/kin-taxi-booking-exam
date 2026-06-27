@@ -7,7 +7,7 @@ import { getMarkerSvg } from "./map-markers.js";
 /**
  * @returns {{ pickup: [number, number], dropoff: [number, number], driverStart: [number, number], shouldAnimate: boolean, status: string, rideId: number|null, useWebSocket: boolean }}
  */
-export function readTrackingData() {
+export function readTrackingData(trackingEnabled = true) {
   const data = window.trackingRide ?? {};
 
   const pickup = /** @type {[number, number]} */ (data.pickup ?? [-4.3217, 15.3125]);
@@ -15,15 +15,16 @@ export function readTrackingData() {
   const driverStart = /** @type {[number, number]} */ (
     data.driver ?? [pickup[0] - 0.018, pickup[1] - 0.012]
   );
+  const baseAnimate = data.animate ?? true;
 
   return {
     pickup,
     dropoff,
     driverStart,
-    shouldAnimate: data.animate ?? true,
+    shouldAnimate: baseAnimate && trackingEnabled,
     status: data.status ?? "assigned",
     rideId: data.rideId ?? null,
-    useWebSocket: Boolean(data.rideId && import.meta.env.VITE_REVERB_APP_KEY),
+    useWebSocket: Boolean(trackingEnabled && data.rideId && import.meta.env.VITE_REVERB_APP_KEY),
   };
 }
 
@@ -41,62 +42,147 @@ export function showMapSetupMessage(container, provider) {
     </div>`;
 }
 
-export function subscribeToTracking(rideId, driverMarker, mapAdapter, etaEl, onStatusChange = null) {
-  const echo = getEcho();
-
-  if (!echo) {
+/**
+ * @param {Record<string, unknown>} payload
+ * @param {{ driverMarker: DriverHandle, mapAdapter: MapAdapter, etaEl: HTMLElement|null, onStatusChange: ((status: string) => void)|null }} ctx
+ */
+export function applyTrackingUpdate(payload, ctx) {
+  if (payload.lat == null || payload.lng == null) {
     return;
   }
 
-  echo.private(`rides.${rideId}`).listen(".tracking.updated", (payload) => {
-    if (payload.lat == null || payload.lng == null) return;
+  const lat = Number(payload.lat);
+  const lng = Number(payload.lng);
 
-    driverMarker.setLatLng([payload.lat, payload.lng]);
-    mapAdapter.panTo([payload.lat, payload.lng]);
+  ctx.driverMarker.setLatLng([lat, lng]);
+  ctx.mapAdapter.panTo([lat, lng]);
 
-    if (etaEl && payload.eta_minutes != null) {
-      etaEl.textContent = String(payload.eta_minutes);
-    }
+  if (ctx.etaEl && payload.eta_minutes != null) {
+    ctx.etaEl.textContent = String(payload.eta_minutes);
+  }
 
-    const stage =
-      payload.status === "course"
-        ? "course"
-        : payload.status === "approche" || payload.status === "assigned"
-          ? "approche"
-          : payload.status;
+  const stage =
+    payload.status === "course"
+      ? "course"
+      : payload.status === "approche" || payload.status === "assigned"
+        ? "approche"
+        : payload.status;
 
-    if (stage) setStep(stage);
+  if (typeof stage === "string") {
+    setStep(stage);
+  }
 
-    if (onStatusChange && payload.status) {
-      onStatusChange(payload.status);
-    }
-  });
+  if (ctx.onStatusChange && payload.status) {
+    ctx.onStatusChange(String(payload.status));
+  }
 }
 
-export function runSimulation(driver, mapAdapter, route, etaEl, pickupIndex = null) {
-  let i = 0;
-  const totalSteps = route.length;
-  const splitAt = pickupIndex ?? Math.floor(totalSteps / 3);
+function updateLiveStatus(mode) {
+  const el = document.getElementById("tracking-live-status");
 
-  const timer = setInterval(() => {
-    if (i >= totalSteps) {
-      clearInterval(timer);
-      setStep("arrivee");
-      if (etaEl) etaEl.textContent = "0";
-      return;
+  if (!el || window.trackingRide?.isDriver) {
+    return;
+  }
+
+  const labels = {
+    websocket: ["Suivi live · WebSocket", "bg-green-100 text-green-700"],
+    polling: ["Suivi live · synchronisation", "bg-blue-100 text-blue-700"],
+    offline: ["Suivi live indisponible", "bg-red-100 text-red-700"],
+  };
+
+  const [text, classes] = labels[mode] ?? labels.offline;
+  el.className = `inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${classes}`;
+  el.textContent = text;
+  el.classList.remove("hidden");
+}
+
+async function fetchTrackingSnapshot(showUrl) {
+  const response = await fetch(showUrl, {
+    headers: { Accept: "application/json" },
+    credentials: "same-origin",
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  return response.json();
+}
+
+function startPolling(showUrl, ctx, intervalMs = 4000) {
+  if (!showUrl || window.__ktbTrackingPollTimer) {
+    return;
+  }
+
+  updateLiveStatus("polling");
+
+  const poll = async () => {
+    try {
+      const payload = await fetchTrackingSnapshot(showUrl);
+
+      if (payload) {
+        applyTrackingUpdate(payload, ctx);
+      }
+    } catch {
+      updateLiveStatus("offline");
+    }
+  };
+
+  poll();
+  window.__ktbTrackingPollTimer = window.setInterval(poll, intervalMs);
+}
+
+export function subscribeToTracking(rideId, driverMarker, mapAdapter, etaEl, onStatusChange = null) {
+  const showUrl = window.trackingRide?.trackingShowUrl ?? null;
+  const ctx = { driverMarker, mapAdapter, etaEl, onStatusChange };
+
+  if (showUrl) {
+    fetchTrackingSnapshot(showUrl)
+      .then((payload) => {
+        if (payload) {
+          applyTrackingUpdate(payload, ctx);
+        }
+      })
+      .catch(() => {});
+  }
+
+  const echo = getEcho();
+
+  if (echo && rideId) {
+    const channel = echo.private(`rides.${rideId}`);
+
+    channel.listen(".tracking.updated", (payload) => {
+      applyTrackingUpdate(payload, ctx);
+      updateLiveStatus("websocket");
+    });
+
+    channel.error(() => {
+      startPolling(showUrl, ctx);
+    });
+
+    if (echo.connector?.pusher?.connection) {
+      echo.connector.pusher.connection.bind("connected", () => {
+        updateLiveStatus("websocket");
+      });
+
+      echo.connector.pusher.connection.bind("unavailable", () => {
+        startPolling(showUrl, ctx);
+      });
+
+      echo.connector.pusher.connection.bind("failed", () => {
+        startPolling(showUrl, ctx);
+      });
     }
 
-    driver.setLatLng(route[i]);
-    mapAdapter.panTo(route[i]);
+    return;
+  }
 
-    const remaining = Math.max(0, Math.round(((totalSteps - i) / totalSteps) * 12));
-    if (etaEl) etaEl.textContent = String(remaining);
+  if (showUrl) {
+    startPolling(showUrl, ctx);
+    return;
+  }
 
-    if (i < splitAt) setStep("approche");
-    else if (i < totalSteps - 2) setStep("course");
-
-    i++;
-  }, 700);
+  updateLiveStatus("offline");
 }
 
 export function buildRoute(a, b, c, steps) {
@@ -151,7 +237,7 @@ export function startTrackingSession(
   pickupIndex = null,
   onStatusChange = null,
 ) {
-  const { pickup, dropoff, driverStart, shouldAnimate, status, rideId, useWebSocket } = tracking;
+  const { pickup, dropoff, driverStart, shouldAnimate, status, rideId } = tracking;
 
   mapAdapter.addMarker(pickup, "pickup", "Point de prise en charge");
   mapAdapter.addMarker(dropoff, "dropoff", "Destination");
@@ -183,10 +269,7 @@ export function startTrackingSession(
     status === "course" ? "course" : status === "approche" ? "approche" : "assigned";
   setStep(initialStage === "assigned" ? "approche" : initialStage);
 
-  if (useWebSocket && rideId) {
+  if (rideId) {
     subscribeToTracking(rideId, driver, mapAdapter, etaEl, onStatusChange);
-    return;
   }
-
-  runSimulation(driver, mapAdapter, route, etaEl, pickupIndex);
 }

@@ -46,6 +46,23 @@ class RideTrackingService
         return $ride;
     }
 
+    /**
+     * @return array{ride_id: int, status: string, lat: float|null, lng: float|null, eta_minutes: int}
+     */
+    public function trackingPayload(Ride $ride): array
+    {
+        $ride->loadMissing(['driver.driverProfile']);
+        $coords = $ride->driverCoordinates();
+
+        return [
+            'ride_id' => $ride->id,
+            'status' => $ride->status,
+            'lat' => $coords[0] ?? null,
+            'lng' => $coords[1] ?? null,
+            'eta_minutes' => $this->estimateEtaMinutes($ride),
+        ];
+    }
+
     public function estimateEtaMinutes(Ride $ride): int
     {
         $coords = $ride->driverCoordinates();

@@ -4,19 +4,23 @@
    Provider : VITE_MAP_PROVIDER=google|mapbox
    ========================================================================== */
 
+import { getTrackingConsentPromise } from "./tracking-consent.js";
+
 document.addEventListener("DOMContentLoaded", async () => {
   const container = document.getElementById("map");
   if (!container) return;
+
+  const consented = await getTrackingConsentPromise();
 
   const provider = (import.meta.env.VITE_MAP_PROVIDER ?? "google").toLowerCase();
 
   try {
     if (provider === "mapbox") {
       const { initMapboxTracking } = await import("./map-mapbox.js");
-      initMapboxTracking(container);
+      initMapboxTracking(container, consented);
     } else {
       const { initGoogleTracking } = await import("./map-google.js");
-      await initGoogleTracking(container);
+      await initGoogleTracking(container, consented);
     }
   } catch (error) {
     console.error("Erreur initialisation carte:", error);

@@ -85,3 +85,34 @@ it('initialise le suivi lors de l\'acceptation d\'une course', function () {
     expect($ride->fresh()->status)->toBe('assigned');
     expect($driver->driverProfile->fresh()->current_lat)->not->toBeNull();
 });
+
+it('expose la position actuelle du chauffeur au client', function () {
+    $client = User::factory()->create();
+    $driver = User::factory()->driver()->create();
+    DriverProfile::factory()->create([
+        'user_id' => $driver->id,
+        'current_lat' => -4.32,
+        'current_lng' => 15.31,
+    ]);
+    $ride = Ride::factory()->create([
+        'client_id' => $client->id,
+        'driver_id' => $driver->id,
+        'status' => 'approche',
+    ]);
+
+    $this->actingAs($client)
+        ->getJson(route('rides.tracking.show', $ride))
+        ->assertOk()
+        ->assertJsonPath('lat', -4.32)
+        ->assertJsonPath('lng', 15.31)
+        ->assertJsonPath('status', 'approche');
+});
+
+it('refuse la consultation GPS à un utilisateur non autorisé', function () {
+    $ride = Ride::factory()->create(['status' => 'approche']);
+    $stranger = User::factory()->create();
+
+    $this->actingAs($stranger)
+        ->getJson(route('rides.tracking.show', $ride))
+        ->assertForbidden();
+});

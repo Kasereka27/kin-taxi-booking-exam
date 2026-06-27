@@ -6,6 +6,7 @@ use App\Http\Requests\UpdateRideTrackingRequest;
 use App\Models\Ride;
 use App\Services\RideTrackingService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class RideTrackingController extends Controller
 {
@@ -26,5 +27,16 @@ class RideTrackingController extends Controller
             'status' => $ride->status,
             'eta_minutes' => $tracking->estimateEtaMinutes($ride),
         ]);
+    }
+
+    public function show(Request $request, Ride $ride, RideTrackingService $tracking): JsonResponse
+    {
+        $this->authorize('view', $ride);
+
+        if (! $ride->isTrackable() || $ride->driver_id === null) {
+            return response()->json(['message' => 'Course non suivie en direct.'], 404);
+        }
+
+        return response()->json($tracking->trackingPayload($ride));
     }
 }

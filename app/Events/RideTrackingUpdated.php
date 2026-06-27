@@ -36,16 +36,6 @@ class RideTrackingUpdated implements ShouldBroadcastNow
      */
     public function broadcastWith(): array
     {
-        $this->ride->loadMissing(['driver.driverProfile']);
-        $coords = $this->ride->driverCoordinates();
-        $tracking = app(RideTrackingService::class);
-
-        return [
-            'ride_id' => $this->ride->id,
-            'status' => $this->ride->status,
-            'lat' => $coords[0] ?? null,
-            'lng' => $coords[1] ?? null,
-            'eta_minutes' => $tracking->estimateEtaMinutes($this->ride),
-        ];
+        return app(RideTrackingService::class)->trackingPayload($this->ride);
     }
 }

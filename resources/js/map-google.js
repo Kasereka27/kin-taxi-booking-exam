@@ -134,7 +134,7 @@ async function refreshRouteForStatus(tracking) {
   }
 }
 
-export async function initGoogleTracking(container) {
+export async function initGoogleTracking(container, trackingEnabled = true) {
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   if (!apiKey) {
@@ -145,7 +145,7 @@ export async function initGoogleTracking(container) {
   setOptions({ key: apiKey, v: "weekly" });
   await importLibrary("maps");
 
-  const tracking = readTrackingData();
+  const tracking = readTrackingData(trackingEnabled);
 
   const map = new google.maps.Map(container, {
     center: toGoogleLatLng(tracking.pickup),
