@@ -1,4 +1,4 @@
-@extends('mainPages.app' , ['cssClass' => 'font-sans text-ink bg-gray-50'])
+@extends('mainPages.dashboard')
 
 @section('title', 'Dashboard Chauffeur')
 
@@ -6,8 +6,9 @@
 @show
 
 @section('content')
-<div class="grid lg:grid-cols-[260px_1fr] min-h-screen">
-    <aside class="bg-ink text-gray-300 p-5 flex lg:flex-col gap-1 overflow-x-auto">
+<x-dashboard-shell>
+  <x-slot name="sidebar">
+    <aside class="w-full h-full lg:min-h-full bg-ink text-gray-300 p-4 sm:p-5 flex flex-row lg:flex-col gap-1 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto min-w-0">
       @include('partials.brand-logo', ['class' => 'hidden lg:flex items-center gap-2.5 font-black text-2xl text-white mb-8 px-2'])
       <nav class="flex lg:flex-col gap-1 flex-1">
         <x-dashboard-nav-link :href="route('user.dashboardDriver')" icon="chart-bar" label="Tableau de bord" :active="true" />
@@ -25,8 +26,8 @@
         </form>
       </div>
     </aside>
+  </x-slot>
 
-    <main class="p-4 sm:p-7 lg:px-9">
       <div class="flex justify-between items-center mb-7 flex-wrap gap-3">
         <div>
           <h1 class="text-2xl font-extrabold">Bonjour, {{ auth()->user()->firstname }} 🚖</h1>
@@ -119,8 +120,7 @@
           </div>
         </div>
       </div>
-    </main>
-  </div>
+</x-dashboard-shell>
 @endsection
 
 @section('footer')

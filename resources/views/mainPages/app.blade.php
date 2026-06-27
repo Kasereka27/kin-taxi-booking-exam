@@ -1,4 +1,4 @@
-@extends('root', ['cssClass' => 'font-sans text-ink bg-gray-50'])
+@extends('root', ['cssClass' => 'font-sans text-ink bg-gray-50 min-h-screen flex flex-col'])
 
 
 @section('childContent')

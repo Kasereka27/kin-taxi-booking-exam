@@ -7,7 +7,7 @@
         <title>@yield('title', "") | {{ config('app.name', 'Laravel') }}</title>
         @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/map.js', 'resources/js/driver-tracking.js'])
     </head>
-    <body @isset($cssClass) class="{{ $cssClass }} min-h-screen flex flex-col" @else class="min-h-screen flex flex-col" @endisset>
+    <body @isset($cssClass) class="{{ $cssClass }}" @else class="min-h-screen flex flex-col" @endisset>
         
         @yield('childContent')
 

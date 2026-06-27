@@ -1,4 +1,4 @@
-@extends('mainPages.app', ['cssClass' => 'font-sans text-ink bg-gray-50'])
+@extends('mainPages.dashboard')
 
 @section('title', 'Dashboard Administrateur')
 
@@ -24,10 +24,11 @@
 @endphp
 
 @section('content')
-<div class="grid lg:grid-cols-[260px_1fr] min-h-screen">
+<x-dashboard-shell>
+  <x-slot name="sidebar">
     @include('partials.admin-sidebar', ['activePage' => 'dashboard'])
+  </x-slot>
 
-    <main class="p-4 sm:p-7 lg:px-9">
       <div class="flex justify-between items-center mb-7 flex-wrap gap-3">
         <div><h1 class="text-2xl font-extrabold">Administration</h1><p class="text-gray-500">Pilotage de la plateforme en temps réel.</p></div>
         <div class="flex gap-3 items-center"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700"><span class="w-2 h-2 rounded-full bg-green-500"></span> Système opérationnel</span><div class="w-10 h-10 rounded-full bg-taxi grid place-items-center font-extrabold text-ink">{{ strtoupper(substr(auth()->user()->firstname, 0, 1).substr(auth()->user()->lastname, 0, 1)) }}</div></div>
@@ -42,7 +43,7 @@
 
       <div class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200 mb-6">
         <h3 class="text-lg font-bold mb-4">Activité des 7 derniers jours</h3>
-        <div class="relative h-72 w-full">
+        <div class="relative h-48 sm:h-56 lg:h-64 w-full max-w-full">
           <canvas id="adminActivityChart"></canvas>
         </div>
       </div>
@@ -120,8 +121,7 @@
           <div class="flex justify-between"><span>Volume traité (mois)</span><strong class="text-xl">@fc($revenueMonth)</strong></div>
         </div>
       </div>
-    </main>
-  </div>
+</x-dashboard-shell>
 @endsection
 
 @section('footer')

@@ -1,4 +1,4 @@
-@extends('mainPages.app', ['cssClass' => 'font-sans text-ink bg-gray-50'])
+@extends('mainPages.dashboard')
 
 @section('title', 'Journal d\'activité')
 
@@ -6,10 +6,11 @@
 @show
 
 @section('content')
-<div class="grid lg:grid-cols-[260px_1fr] min-h-screen">
+<x-dashboard-shell>
+  <x-slot name="sidebar">
     @include('partials.admin-sidebar', ['activePage' => 'activity-logs'])
+  </x-slot>
 
-    <main class="p-4 sm:p-7 lg:px-9">
       <div class="flex justify-between items-center mb-7 flex-wrap gap-3">
         <div>
           <h1 class="text-2xl font-extrabold">Journal d'activité</h1>
@@ -87,8 +88,7 @@
           {{ $logs->links() }}
         </div>
       @endif
-    </main>
-  </div>
+</x-dashboard-shell>
 @endsection
 
 @section('footer')

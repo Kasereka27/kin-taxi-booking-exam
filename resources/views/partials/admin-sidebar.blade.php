@@ -2,7 +2,7 @@
     $activePage = $activePage ?? '';
 @endphp
 
-<aside class="bg-ink text-gray-300 p-5 flex lg:flex-col gap-1 overflow-x-auto">
+<aside class="w-full h-full lg:min-h-full bg-ink text-gray-300 p-4 sm:p-5 flex flex-row lg:flex-col gap-1 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto min-w-0">
   @include('partials.brand-logo', ['class' => 'hidden lg:flex items-center gap-2.5 font-black text-2xl text-white mb-8 px-2'])
   <nav class="flex lg:flex-col gap-1 flex-1">
     <x-dashboard-nav-link :href="route('admin.dashboard')" icon="chart-bar" label="Vue d'ensemble" :active="$activePage === 'dashboard'" />
