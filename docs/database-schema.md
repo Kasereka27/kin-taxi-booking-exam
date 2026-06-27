@@ -6,18 +6,18 @@
 
 ```mermaid
 erDiagram
-    users ||--o| driver_profiles : has
-    users ||--o{ rides : client
-    users ||--o{ rides : driver
-    users ||--o{ payments : pays
-    users ||--o{ ratings : from
-    users ||--o{ ratings : to
-    users ||--o{ otp_codes : has
-    users ||--o{ activity_logs : has
-    users ||--o{ notifications : receives
+    users ||--o| driver_profiles : "profil chauffeur"
+    users ||--o{ rides : "client_id"
+    users ||--o{ rides : "driver_id"
+    users ||--o{ payments : "payeur"
+    users ||--o{ ratings : "from_user_id"
+    users ||--o{ ratings : "to_user_id"
+    users ||--o{ otp_codes : "codes OTP"
+    users ||--o{ activity_logs : "journal audit"
+    users ||--o{ notifications : "notifiable"
 
-    rides ||--o{ payments : has
-    rides ||--o{ ratings : has
+    rides ||--o{ payments : "paiements"
+    rides ||--o{ ratings : "avis"
 
     users {
         bigint id PK
@@ -89,7 +89,7 @@ erDiagram
         bigint from_user_id FK
         bigint to_user_id FK
         int stars
-        text comment
+        text review
     }
 
     otp_codes {
@@ -119,7 +119,7 @@ erDiagram
     }
 ```
 
-> **Note Mermaid :** une seule contrainte (`PK`, `FK` ou `UK`) est autorisée par attribut dans le diagramme. Les index uniques (`email`, `phone`, `order_number`, `plate`, `user_id` sur `driver_profiles`) et les valeurs `enum` sont détaillés dans les tableaux ci-dessous.
+> **Note Mermaid :** les libellés de relation sont entre guillemets car Mermaid réserve certains mots (`to`, `from`, etc.). Une seule contrainte (`PK`, `FK` ou `UK`) est autorisée par attribut. L’attribut `review` dans le diagramme correspond à la colonne `comment` en base. Les index uniques et les `enum` sont détaillés dans les tableaux ci-dessous.
 
 ## Tables principales
 
