@@ -6,46 +6,46 @@
 
 ```mermaid
 erDiagram
-    users ||--o| driver_profiles : "1 chauffeur"
-    users ||--o{ rides : "client_id"
-    users ||--o{ rides : "driver_id"
-    users ||--o{ payments : "payeur"
-    users ||--o{ ratings : "from_user"
-    users ||--o{ ratings : "to_user"
-    users ||--o{ otp_codes : "2FA"
-    users ||--o{ activity_logs : "audit"
-    users ||--o{ notifications : "notifiable"
+    users ||--o| driver_profiles : has
+    users ||--o{ rides : client
+    users ||--o{ rides : driver
+    users ||--o{ payments : pays
+    users ||--o{ ratings : from
+    users ||--o{ ratings : to
+    users ||--o{ otp_codes : has
+    users ||--o{ activity_logs : has
+    users ||--o{ notifications : receives
 
-    rides ||--o{ payments : "1-N"
-    rides ||--o{ ratings : "1-N"
+    rides ||--o{ payments : has
+    rides ||--o{ ratings : has
 
     users {
         bigint id PK
         string firstname
         string lastname
-        string email UK
-        string phone UK
-        string google_id UK
-        timestamp email_verified_at
+        string email
+        string phone
+        string google_id
+        datetime email_verified_at
         string password
-        enum role "admin|driver|client"
+        string role
         boolean is_active
         boolean two_factor_enabled
-        timestamps created_at
-        softDeletes deleted_at
+        datetime created_at
+        datetime deleted_at
     }
 
     driver_profiles {
         bigint id PK
-        bigint user_id FK UK
+        bigint user_id FK
         string vehicle_model
-        string plate UK
-        enum vehicle_type
+        string plate
+        string vehicle_type
         decimal rating
         boolean is_online
         decimal current_lat
         decimal current_lng
-        enum approval_status
+        string approval_status
     }
 
     rides {
@@ -58,29 +58,29 @@ erDiagram
         string dropoff_addr
         decimal dropoff_lat
         decimal dropoff_lng
-        enum vehicle_type
-        enum status
+        string vehicle_type
+        string status
         decimal price
         decimal distance_km
-        timestamps requested_at
-        timestamps accepted_at
-        timestamps completed_at
-        timestamps cancelled_at
+        datetime requested_at
+        datetime accepted_at
+        datetime completed_at
+        datetime cancelled_at
     }
 
     payments {
         bigint id PK
         bigint ride_id FK
         bigint user_id FK
-        string order_number UK
-        enum method
+        string order_number
+        string method
         string provider_reference
         decimal amount
         decimal fee
-        enum status
+        string status
         string failure_reason
         string receipt_path
-        timestamp paid_at
+        datetime paid_at
     }
 
     ratings {
@@ -88,7 +88,7 @@ erDiagram
         bigint ride_id FK
         bigint from_user_id FK
         bigint to_user_id FK
-        tinyint stars
+        int stars
         text comment
     }
 
@@ -96,8 +96,8 @@ erDiagram
         bigint id PK
         bigint user_id FK
         string code
-        timestamp expires_at
-        timestamp used_at
+        datetime expires_at
+        datetime used_at
     }
 
     activity_logs {
@@ -112,11 +112,14 @@ erDiagram
     notifications {
         uuid id PK
         string type
-        morphs notifiable
+        bigint notifiable_id
+        string notifiable_type
         text data
-        timestamp read_at
+        datetime read_at
     }
 ```
+
+> **Note Mermaid :** une seule contrainte (`PK`, `FK` ou `UK`) est autorisée par attribut dans le diagramme. Les index uniques (`email`, `phone`, `order_number`, `plate`, `user_id` sur `driver_profiles`) et les valeurs `enum` sont détaillés dans les tableaux ci-dessous.
 
 ## Tables principales
 
