@@ -25,22 +25,7 @@
 
 @section('content')
 <div class="grid lg:grid-cols-[260px_1fr] min-h-screen">
-    <aside class="bg-ink text-gray-300 p-5 flex lg:flex-col gap-1 overflow-x-auto">
-      @include('partials.brand-logo', ['class' => 'hidden lg:flex items-center gap-2.5 font-black text-2xl text-white mb-8 px-2'])
-      <nav class="flex lg:flex-col gap-1 flex-1">
-        <x-dashboard-nav-link :href="route('admin.dashboard')" icon="chart-bar" label="Vue d'ensemble" :active="true" />
-        <x-dashboard-nav-link href="#courses" icon="taxi" label="Courses" />
-        <x-dashboard-nav-link :href="route('admin.users')" icon="users" label="Utilisateurs" />
-        <x-dashboard-nav-link :href="route('admin.activity-logs')" icon="clipboard-document-list" label="Journal d'activité" />
-        <x-dashboard-nav-link href="#paiements" icon="banknotes" label="Paiements" />
-      </nav>
-      <div class="hidden lg:block border-t border-gray-800 pt-4 mt-4">
-        <form method="POST" action="{{ route('logout') }}">
-          @csrf
-          <button type="submit" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold text-gray-400 hover:bg-gray-800 hover:text-white transition"><x-icon name="arrow-right-on-rectangle" class="w-5 h-5 shrink-0" /> Déconnexion</button>
-        </form>
-      </div>
-    </aside>
+    @include('partials.admin-sidebar', ['activePage' => 'dashboard'])
 
     <main class="p-4 sm:p-7 lg:px-9">
       <div class="flex justify-between items-center mb-7 flex-wrap gap-3">
@@ -62,7 +47,16 @@
         </div>
       </div>
 
-      <div id="courses" class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">Courses en cours</h2><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Live</span></div>
+      <div id="courses" class="flex justify-between items-center mb-4 flex-wrap gap-3">
+        <div class="flex items-center gap-3 flex-wrap">
+          <h2 class="text-xl font-bold">Courses en cours</h2>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Live</span>
+        </div>
+        <a href="{{ route('admin.live-rides') }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-bold border-2 border-gray-300 hover:border-ink transition">
+          Voir tout ({{ number_format($liveRidesCount, 0, ',', ' ') }})
+          <x-icon name="arrow-right" class="w-4 h-4" />
+        </a>
+      </div>
       <div class="overflow-x-auto rounded-xl border border-gray-200 mb-6">
         <table class="w-full bg-white">
           <thead><tr class="bg-gray-50 text-gray-700 text-xs uppercase"><th class="text-left px-4 py-3.5 font-bold">Réf.</th><th class="text-left px-4 py-3.5 font-bold">Client</th><th class="text-left px-4 py-3.5 font-bold">Chauffeur</th><th class="text-left px-4 py-3.5 font-bold">Trajet</th><th class="text-left px-4 py-3.5 font-bold">Montant</th><th class="text-left px-4 py-3.5 font-bold">Statut</th><th class="text-left px-4 py-3.5 font-bold">Action</th></tr></thead>
@@ -78,7 +72,7 @@
               <td class="px-4 py-3.5"><a href="{{ route('rides.show', $ride) }}" class="inline-flex px-3 py-1.5 rounded-full text-xs font-bold border-2 border-gray-300 hover:border-ink transition">Voir</a></td>
             </tr>
             @empty
-            <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">Aucune course pour le moment.</td></tr>
+            <tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">Aucune course en cours. <a href="{{ route('admin.live-rides') }}" class="font-semibold text-ink underline">Ouvrir le suivi complet</a></td></tr>
             @endforelse
           </tbody>
         </table>

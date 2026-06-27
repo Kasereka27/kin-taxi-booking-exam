@@ -109,8 +109,10 @@ Route::middleware(['auth', 'active'])->group(function () {
         ->controller(AdminController::class)
         ->group(function () {
             Route::get('/dashboard', 'dashboard')->name('dashboard');
+            Route::get('/live-rides', 'liveRides')->name('live-rides');
             Route::get('/users', 'users')->name('users');
             Route::patch('/users/{user}/toggle-active', 'toggleUserActive')->name('users.toggle');
+            Route::delete('/users/{user}', 'destroyUser')->name('users.destroy');
             Route::get('/activity-logs', 'activityLogs')->name('activity-logs');
         });
 

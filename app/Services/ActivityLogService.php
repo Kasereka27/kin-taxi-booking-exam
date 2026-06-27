@@ -22,6 +22,8 @@ class ActivityLogService
 
     public const ACTION_USER_REACTIVATED = 'user.reactivated';
 
+    public const ACTION_USER_DELETED = 'user.deleted';
+
     public const ACTION_PAYMENT_SUCCESS = 'payment.success';
 
     public const ACTION_PAYMENT_FAILED = 'payment.failed';
@@ -39,6 +41,7 @@ class ActivityLogService
             self::ACTION_RIDE_CANCELLED => 'Course annulée',
             self::ACTION_USER_BLOCKED => 'Compte bloqué',
             self::ACTION_USER_REACTIVATED => 'Compte réactivé',
+            self::ACTION_USER_DELETED => 'Compte supprimé',
             self::ACTION_PAYMENT_SUCCESS => 'Paiement réussi',
             self::ACTION_PAYMENT_FAILED => 'Paiement échoué',
         ];

@@ -36,19 +36,13 @@ class AdminController extends Controller
             ? round($cancelledRides / $totalRides * 100, 1)
             : 0.0;
 
-        $liveStatuses = ['pending', 'assigned', 'approche', 'course'];
         $liveRides = Ride::with(['client', 'driver'])
-            ->whereIn('status', $liveStatuses)
+            ->live()
             ->latest('requested_at')
-            ->limit(8)
+            ->limit(5)
             ->get();
 
-        if ($liveRides->isEmpty()) {
-            $liveRides = Ride::with(['client', 'driver'])
-                ->latest('requested_at')
-                ->limit(8)
-                ->get();
-        }
+        $liveRidesCount = Ride::query()->live()->count();
 
         $topDrivers = User::where('role', 'driver')
             ->withCount(['ridesAsDriver as completed_rides_count' => function ($query) {
@@ -80,6 +74,7 @@ class AdminController extends Controller
             'onlineDrivers' => $onlineDrivers,
             'cancellationRate' => $cancellationRate,
             'liveRides' => $liveRides,
+            'liveRidesCount' => $liveRidesCount,
             'topDrivers' => $topDrivers,
             'paymentsByMethod' => $paymentsByMethod,
             'paymentsCount' => $paymentsCount,
@@ -89,13 +84,53 @@ class AdminController extends Controller
         ]);
     }
 
+    public function liveRides(Request $request): View
+    {
+        $search = trim((string) $request->query('search', ''));
+        $status = (string) $request->query('status', '');
+
+        $rides = Ride::query()
+            ->with(['client', 'driver'])
+            ->live()
+            ->when($status !== '', fn ($query) => $query->where('status', $status))
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($subQuery) use ($search) {
+                    $subQuery->where('pickup_addr', 'like', "%{$search}%")
+                        ->orWhere('dropoff_addr', 'like', "%{$search}%")
+                        ->orWhereHas('client', function ($userQuery) use ($search) {
+                            $userQuery->where('firstname', 'like', "%{$search}%")
+                                ->orWhere('lastname', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('driver', function ($userQuery) use ($search) {
+                            $userQuery->where('firstname', 'like', "%{$search}%")
+                                ->orWhere('lastname', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->latest('requested_at')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('pageContent.adminLiveRides', [
+            'rides' => $rides,
+            'search' => $search,
+            'status' => $status,
+            'statusLabels' => Ride::statusLabels(),
+        ]);
+    }
+
     public function users(Request $request): View
     {
         $search = trim((string) $request->query('search', ''));
         $role = (string) $request->query('role', '');
+        $status = (string) $request->query('status', '');
 
         $users = User::query()
             ->when($role !== '', fn ($query) => $query->where('role', $role))
+            ->when($status === 'active', fn ($query) => $query->where('is_active', true))
+            ->when($status === 'blocked', fn ($query) => $query->where('is_active', false))
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($subQuery) use ($search) {
                     $subQuery->where('firstname', 'like', "%{$search}%")
@@ -112,6 +147,7 @@ class AdminController extends Controller
             'users' => $users,
             'search' => $search,
             'role' => $role,
+            'status' => $status,
         ]);
     }
 
@@ -133,6 +169,32 @@ class AdminController extends Controller
         );
 
         return back()->with('status', "Le compte de {$user->firstname} {$user->lastname} a été {$label}.");
+    }
+
+    public function destroyUser(Request $request, User $user): RedirectResponse
+    {
+        if ($user->isAdmin()) {
+            return back()->with('error', 'Impossible de supprimer un administrateur.');
+        }
+
+        if ($user->is($request->user())) {
+            return back()->with('error', 'Vous ne pouvez pas supprimer votre propre compte.');
+        }
+
+        $label = "{$user->firstname} {$user->lastname}";
+        $email = $user->email;
+
+        $user->tokens()->delete();
+        $user->delete();
+
+        $this->activityLogService->log(
+            ActivityLogService::ACTION_USER_DELETED,
+            "Compte de {$label} ({$email}) supprimé par un administrateur.",
+            $request->user(),
+            $request,
+        );
+
+        return back()->with('status', "Le compte de {$label} a été supprimé.");
     }
 
     public function activityLogs(Request $request): View

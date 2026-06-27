@@ -62,6 +62,51 @@ it('filtre les utilisateurs par rôle', function () {
         ->assertDontSee('ClientUnique');
 });
 
+it('filtre les utilisateurs bloqués', function () {
+    $admin = User::factory()->admin()->create();
+    User::factory()->create(['firstname' => 'ActifUnique', 'is_active' => true]);
+    User::factory()->create(['firstname' => 'BloqueUnique', 'is_active' => false]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.users', ['status' => 'blocked']))
+        ->assertOk()
+        ->assertSee('BloqueUnique')
+        ->assertDontSee('ActifUnique');
+});
+
+it('affiche la page des courses en cours pour un admin', function () {
+    $admin = User::factory()->admin()->create();
+    $client = User::factory()->create();
+    $driver = User::factory()->driver()->create();
+
+    Ride::factory()->create([
+        'client_id' => $client->id,
+        'driver_id' => $driver->id,
+        'status' => 'course',
+        'pickup_addr' => 'Gombe, Kinshasa',
+    ]);
+
+    Ride::factory()->create([
+        'client_id' => $client->id,
+        'status' => 'completed',
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.live-rides'))
+        ->assertOk()
+        ->assertSee('Courses en cours')
+        ->assertSee('Gombe')
+        ->assertSee('En course');
+});
+
+it('interdit la page des courses en cours aux non-admins', function () {
+    $client = User::factory()->create();
+
+    $this->actingAs($client)
+        ->get(route('admin.live-rides'))
+        ->assertForbidden();
+});
+
 it('permet à un admin de bloquer puis réactiver un client', function () {
     $admin = User::factory()->admin()->create();
     $client = User::factory()->create(['is_active' => true]);
@@ -95,4 +140,50 @@ it('interdit la gestion des utilisateurs aux non-admins', function () {
     $this->actingAs($client)
         ->get(route('admin.users'))
         ->assertForbidden();
+});
+
+it('permet à un admin de supprimer un client', function () {
+    $admin = User::factory()->admin()->create();
+    $client = User::factory()->create(['email' => 'delete-me@exemple.com']);
+
+    $this->actingAs($admin)
+        ->delete(route('admin.users.destroy', $client))
+        ->assertRedirect()
+        ->assertSessionHas('status');
+
+    expect(User::find($client->id))->toBeNull();
+    expect(User::withTrashed()->find($client->id))->not->toBeNull();
+});
+
+it('révoque les tokens API lors de la suppression d un utilisateur', function () {
+    $admin = User::factory()->admin()->create();
+    $client = User::factory()->create();
+    $client->createToken('mobile');
+
+    $this->actingAs($admin)
+        ->delete(route('admin.users.destroy', $client))
+        ->assertRedirect();
+
+    expect($client->tokens()->count())->toBe(0);
+});
+
+it('empêche un admin de supprimer un autre administrateur', function () {
+    $admin = User::factory()->admin()->create();
+    $otherAdmin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->delete(route('admin.users.destroy', $otherAdmin))
+        ->assertSessionHas('error');
+
+    expect($otherAdmin->fresh())->not->toBeNull();
+});
+
+it('empêche un admin de supprimer son propre compte', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->delete(route('admin.users.destroy', $admin))
+        ->assertSessionHas('error');
+
+    expect($admin->fresh())->not->toBeNull();
 });

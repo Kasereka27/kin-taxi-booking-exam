@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -105,6 +106,14 @@ class Ride extends Model
     /**
      * @return array<string, string>
      */
+    /**
+     * @return list<string>
+     */
+    public static function liveStatuses(): array
+    {
+        return ['pending', 'assigned', 'approche', 'course'];
+    }
+
     public static function statusLabels(): array
     {
         return [
@@ -115,6 +124,15 @@ class Ride extends Model
             'completed' => 'Terminée',
             'cancelled' => 'Annulée',
         ];
+    }
+
+    /**
+     * @param  Builder<static>  $query
+     * @return Builder<static>
+     */
+    public function scopeLive($query)
+    {
+        return $query->whereIn('status', self::liveStatuses());
     }
 
     public function statusLabel(): string

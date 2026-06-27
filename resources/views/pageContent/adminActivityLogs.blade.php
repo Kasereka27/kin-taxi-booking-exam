@@ -7,20 +7,7 @@
 
 @section('content')
 <div class="grid lg:grid-cols-[260px_1fr] min-h-screen">
-    <aside class="bg-ink text-gray-300 p-5 flex lg:flex-col gap-1 overflow-x-auto">
-      @include('partials.brand-logo', ['class' => 'hidden lg:flex items-center gap-2.5 font-black text-2xl text-white mb-8 px-2'])
-      <nav class="flex lg:flex-col gap-1 flex-1">
-        <x-dashboard-nav-link :href="route('admin.dashboard')" icon="chart-bar" label="Vue d'ensemble" />
-        <x-dashboard-nav-link :href="route('admin.users')" icon="users" label="Utilisateurs" />
-        <x-dashboard-nav-link :href="route('admin.activity-logs')" icon="clipboard-document-list" label="Journal d'activité" :active="true" />
-      </nav>
-      <div class="hidden lg:block border-t border-gray-800 pt-4 mt-4">
-        <form method="POST" action="{{ route('logout') }}">
-          @csrf
-          <button type="submit" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold text-gray-400 hover:bg-gray-800 hover:text-white transition"><x-icon name="arrow-right-on-rectangle" class="w-5 h-5 shrink-0" /> Déconnexion</button>
-        </form>
-      </div>
-    </aside>
+    @include('partials.admin-sidebar', ['activePage' => 'activity-logs'])
 
     <main class="p-4 sm:p-7 lg:px-9">
       <div class="flex justify-between items-center mb-7 flex-wrap gap-3">

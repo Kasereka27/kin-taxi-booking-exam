@@ -38,6 +38,20 @@ it('journalise le blocage d\'un utilisateur par un admin', function () {
     ]);
 });
 
+it('journalise la suppression d\'un utilisateur par un admin', function () {
+    $admin = User::factory()->admin()->create();
+    $client = User::factory()->create();
+
+    $this->actingAs($admin)
+        ->delete(route('admin.users.destroy', $client))
+        ->assertRedirect();
+
+    $this->assertDatabaseHas('activity_logs', [
+        'user_id' => $admin->id,
+        'action' => ActivityLogService::ACTION_USER_DELETED,
+    ]);
+});
+
 it('affiche le journal d\'activité pour un administrateur', function () {
     $admin = User::factory()->admin()->create();
 
