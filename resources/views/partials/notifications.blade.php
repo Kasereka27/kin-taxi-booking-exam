@@ -6,7 +6,7 @@
 
 <div class="relative">
   <button id="notifToggle" type="button" class="relative inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-100 transition" aria-label="Notifications">
-    <span class="text-xl">🔔</span>
+    <span class="text-xl"><x-icon name="bell" class="w-5 h-5 text-gray-600" /></span>
     @if ($unreadCount > 0)
       <span class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold grid place-items-center">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
     @endif
@@ -28,7 +28,7 @@
         <form method="POST" action="{{ route('notifications.read', $notif->id) }}">
           @csrf
           <button type="submit" class="w-full text-left flex gap-3 px-4 py-3 hover:bg-gray-50 transition {{ $notif->read_at ? '' : 'bg-yellow-50' }}">
-            <span class="text-lg shrink-0">{{ $notif->data['icon'] ?? '🔔' }}</span>
+            <x-icon :name="$notif->data['icon'] ?? 'bell'" class="w-5 h-5 shrink-0 text-taxi-dark" />
             <span class="min-w-0">
               <span class="block font-semibold text-sm truncate">{{ $notif->data['title'] ?? 'Notification' }}</span>
               <span class="block text-xs text-gray-500 line-clamp-2">{{ $notif->data['message'] ?? '' }}</span>

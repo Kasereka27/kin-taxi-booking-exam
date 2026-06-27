@@ -24,7 +24,7 @@
             <a href="{{ route('login') }}" class="hidden sm:inline-flex px-4 py-2 rounded-full font-bold text-sm hover:bg-gray-100 transition">Connexion</a>
             <a href="{{ route('register') }}" class="inline-flex px-4 py-2 rounded-full font-bold text-sm bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition">S'inscrire</a>
           @endauth
-          <button id="menuToggle" type="button" class="md:hidden text-2xl">☰</button>
+          <button id="menuToggle" type="button" class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition" aria-label="Menu"><x-icon name="bars-3" class="w-6 h-6" /></button>
         </div>
       </div>
       <nav id="mobileMenu" class="hidden md:hidden flex-col gap-2 pb-4">

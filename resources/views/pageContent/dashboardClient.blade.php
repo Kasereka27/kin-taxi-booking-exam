@@ -11,27 +11,27 @@
     <aside class="bg-ink text-gray-300 p-5 flex lg:flex-col gap-1 overflow-x-auto">
       @include('partials.brand-logo', ['class' => 'hidden lg:flex items-center gap-2.5 font-black text-2xl text-white mb-8 px-2'])
       <nav class="flex lg:flex-col gap-1 flex-1">
-        <a href="{{ route('user.dashboardClient') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap bg-taxi text-ink">📊 <span class="hidden lg:inline">Tableau de bord</span></a>
-        <a href="{{ route('reservation') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">➕ <span class="hidden lg:inline">Nouvelle course</span></a>
-        <a href="{{ route('suivi') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">📡 <span class="hidden lg:inline">Suivi en direct</span></a>
-        <a href="{{ route('rides.index') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🕓 <span class="hidden lg:inline">Historique</span></a>
-        <a href="{{ route('rides.index', ['status' => 'completed']) }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">💳 <span class="hidden lg:inline">Paiement</span></a>
-        <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">👤 <span class="hidden lg:inline">Profil</span></a>
-        <a href="{{ route('contact') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🛟 <span class="hidden lg:inline">Aide</span></a>
+        <x-dashboard-nav-link :href="route('user.dashboardClient')" icon="chart-bar" label="Tableau de bord" :active="true" />
+        <x-dashboard-nav-link :href="route('reservation')" icon="plus" label="Nouvelle course" />
+        <x-dashboard-nav-link :href="route('suivi')" icon="signal" label="Suivi en direct" />
+        <x-dashboard-nav-link :href="route('rides.index')" icon="clock" label="Historique" />
+        <x-dashboard-nav-link :href="route('rides.index', ['status' => 'completed'])" icon="credit-card" label="Paiement" />
+        <x-dashboard-nav-link :href="route('profile.edit')" icon="user" label="Profil" />
+        <x-dashboard-nav-link :href="route('contact')" icon="lifebuoy" label="Aide" />
       </nav>
       <div class="hidden lg:block border-t border-gray-800 pt-4 mt-4">
         <form method="POST" action="{{ route('logout') }}">
           @csrf
-          <button type="submit" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold text-gray-400 hover:bg-gray-800 hover:text-white transition">🚪 Déconnexion</button>
+          <button type="submit" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold text-gray-400 hover:bg-gray-800 hover:text-white transition"><x-icon name="arrow-right-on-rectangle" class="w-5 h-5 shrink-0" /> Déconnexion</button>
         </form>
       </div>
     </aside>
 
     <!-- Main -->
-    <main class="p-7 lg:px-9">
+    <main class="p-4 sm:p-7 lg:px-9">
       <div class="flex justify-between items-center mb-7 flex-wrap gap-3">
         <div>
-          <h1 class="text-2xl font-extrabold">Bonjour, {{ auth()->user()->firstname }} 👋</h1>
+          <h1 class="text-xl sm:text-2xl font-extrabold">Bonjour, {{ auth()->user()->firstname }}</h1>
           <p class="text-gray-500">Voici un aperçu de votre activité.</p>
         </div>
         <div class="flex gap-3 items-center">
@@ -49,7 +49,7 @@
         <div class="bg-white rounded-xl p-5 shadow-xs border border-gray-200"><div class="text-gray-500 text-sm">Courses totales</div><div class="text-3xl font-extrabold mt-1">{{ $totalRides }}</div><div class="text-gray-500 text-sm mt-1.5">depuis l'inscription</div></div>
         <div class="bg-white rounded-xl p-5 shadow-xs border border-gray-200"><div class="text-gray-500 text-sm">Dépenses du mois</div><div class="text-3xl font-extrabold mt-1">@fc($monthSpend)</div><div class="text-gray-500 text-sm mt-1.5">{{ now()->translatedFormat('F Y') }}</div></div>
         <div class="bg-white rounded-xl p-5 shadow-xs border border-gray-200"><div class="text-gray-500 text-sm">Distance parcourue</div><div class="text-3xl font-extrabold mt-1">{{ number_format((float) $totalDistance, 0, ',', ' ') }} km</div><div class="text-gray-500 text-sm mt-1.5">courses terminées</div></div>
-        <div class="bg-white rounded-xl p-5 shadow-xs border border-gray-200"><div class="text-gray-500 text-sm">Note moyenne donnée</div><div class="text-3xl font-extrabold mt-1">{{ $avgRatingGiven ? number_format((float) $avgRatingGiven, 1) : '—' }}★</div><div class="text-gray-500 text-sm mt-1.5">Merci !</div></div>
+        <div class="bg-white rounded-xl p-5 shadow-xs border border-gray-200"><div class="text-gray-500 text-sm">Note moyenne donnée</div><div class="text-3xl font-extrabold mt-1 inline-flex items-center gap-1">{{ $avgRatingGiven ? number_format((float) $avgRatingGiven, 1) : '—' }}@if ($avgRatingGiven)<x-icon name="star-solid" class="w-5 h-5 text-taxi" />@endif</div><div class="text-gray-500 text-sm mt-1.5">Merci !</div></div>
       </div>
 
       <!-- Course en cours -->

@@ -4,9 +4,9 @@
 
 @php
     $statusMeta = match ($payment->status) {
-        'success' => ['label' => 'Paiement réussi', 'badge' => 'bg-green-100 text-green-700', 'icon' => '✅'],
-        'failed' => ['label' => 'Paiement refusé', 'badge' => 'bg-red-100 text-red-700', 'icon' => '❌'],
-        default => ['label' => 'En attente de validation', 'badge' => 'bg-yellow-100 text-yellow-700', 'icon' => '⏳'],
+        'success' => ['label' => 'Paiement réussi', 'badge' => 'bg-green-100 text-green-700', 'icon' => 'check-circle'],
+        'failed' => ['label' => 'Paiement refusé', 'badge' => 'bg-red-100 text-red-700', 'icon' => 'x-circle'],
+        default => ['label' => 'En attente de validation', 'badge' => 'bg-yellow-100 text-yellow-700', 'icon' => 'hourglass'],
     };
 
     $failureMessage = match ($payment->failure_reason) {
@@ -20,7 +20,7 @@
 <section class="py-10">
   <div class="max-w-md mx-auto px-5">
     <div class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200 text-center">
-      <div class="text-5xl mb-3">{{ $statusMeta['icon'] }}</div>
+      <div class="flex justify-center mb-3 text-green-600"><x-icon :name="$statusMeta['icon']" class="w-14 h-14" /></div>
       <span class="inline-flex px-3 py-1 rounded-full text-xs font-bold {{ $statusMeta['badge'] }}">{{ $statusMeta['label'] }}</span>
 
       <h1 class="text-2xl font-extrabold mt-4">@fc($payment->amount)</h1>

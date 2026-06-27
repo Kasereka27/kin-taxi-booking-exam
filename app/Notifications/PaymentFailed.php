@@ -42,7 +42,7 @@ class PaymentFailed extends Notification implements ShouldQueue
     {
         return [
             'type' => 'payment_failed',
-            'icon' => '❌',
+            'icon' => 'x-circle',
             'title' => 'Paiement refusé',
             'message' => 'Le paiement de la course #'.Ride::referenceFor($this->payment->ride_id).' a été refusé. '.$this->reasonText(),
             'url' => route('rides.pay', $this->payment->ride_id),

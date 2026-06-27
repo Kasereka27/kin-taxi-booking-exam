@@ -3,10 +3,10 @@
 @section('title', 'Vérification e-mail')
 
 @section('childContent')
-<div class="min-h-screen flex items-center justify-center p-10 bg-gray-50">
-  <div class="w-full max-w-md bg-white rounded-2xl p-10 shadow-lg2 text-center">
-    <div class="text-5xl mb-4">✉️</div>
-    <h1 class="text-3xl font-extrabold mb-3">Confirmez votre e-mail</h1>
+<div class="min-h-screen flex items-center justify-center p-5 sm:p-10 bg-gray-50">
+  <div class="w-full max-w-md bg-white rounded-2xl p-6 sm:p-10 shadow-lg2 text-center">
+    <div class="flex justify-center mb-4 text-taxi-dark"><x-icon name="envelope" class="w-14 h-14" /></div>
+    <h1 class="text-2xl sm:text-3xl font-extrabold mb-3">Confirmez votre e-mail</h1>
     <p class="text-gray-500 text-sm mb-6">
       Un lien de confirmation a été envoyé à <strong>{{ auth()->user()->email }}</strong>.
       Cliquez dessus pour activer toutes les fonctionnalités de votre compte.

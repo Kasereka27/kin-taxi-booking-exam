@@ -8,6 +8,7 @@ import {
   requestDrivingRoute,
   toGoogleLatLng,
 } from "./map-google-directions.js";
+import { getMarkerSvg } from "./map-markers.js";
 import {
   buildRoute,
   readTrackingData,
@@ -21,18 +22,18 @@ let routeLayer = null;
 /**
  * @param {google.maps.Map} map
  * @param {[number, number]} latLng
- * @param {string} emoji
+ * @param {'pickup'|'dropoff'|'driver'} markerType
  * @param {string} title
  */
-function addEmojiMarker(map, latLng, emoji, title) {
+function addSvgMarker(map, latLng, markerType, title) {
   return new google.maps.Marker({
     position: toGoogleLatLng(latLng),
     map,
     title,
-    label: {
-      text: emoji,
-      fontSize: "26px",
-      fontWeight: "700",
+    icon: {
+      url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(getMarkerSvg(markerType))}`,
+      scaledSize: new google.maps.Size(32, 32),
+      anchor: new google.maps.Point(16, 32),
     },
     optimized: false,
   });
@@ -167,8 +168,8 @@ export async function initGoogleTracking(container) {
       points.forEach((pt) => bounds.extend(toGoogleLatLng(pt)));
       map.fitBounds(bounds, padding);
     },
-    addMarker(latLng, emoji, title) {
-      addEmojiMarker(map, latLng, emoji, title);
+    addMarker(latLng, markerType, title) {
+      addSvgMarker(map, latLng, markerType, title);
     },
   };
 
@@ -180,7 +181,7 @@ export async function initGoogleTracking(container) {
     mapAdapter,
     tracking,
     (driverStart) => {
-      const marker = addEmojiMarker(map, driverStart, "🚕", "Votre chauffeur");
+      const marker = addSvgMarker(map, driverStart, "driver", "Votre chauffeur");
 
       return {
         setLatLng([lat, lng]) {

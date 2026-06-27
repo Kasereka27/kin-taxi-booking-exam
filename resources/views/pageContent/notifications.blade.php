@@ -24,7 +24,7 @@
         <form method="POST" action="{{ route('notifications.read', $notif->id) }}">
           @csrf
           <button type="submit" class="w-full text-left flex gap-4 px-5 py-4 hover:bg-gray-50 transition {{ $notif->read_at ? '' : 'bg-yellow-50' }}">
-            <span class="text-2xl shrink-0">{{ $notif->data['icon'] ?? '🔔' }}</span>
+            <x-icon :name="$notif->data['icon'] ?? 'bell'" class="w-6 h-6 shrink-0 text-taxi-dark" />
             <span class="min-w-0 flex-1">
               <span class="flex items-center gap-2">
                 <span class="font-semibold">{{ $notif->data['title'] ?? 'Notification' }}</span>

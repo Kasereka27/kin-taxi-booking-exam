@@ -28,21 +28,21 @@
     <aside class="bg-ink text-gray-300 p-5 flex lg:flex-col gap-1 overflow-x-auto">
       @include('partials.brand-logo', ['class' => 'hidden lg:flex items-center gap-2.5 font-black text-2xl text-white mb-8 px-2'])
       <nav class="flex lg:flex-col gap-1 flex-1">
-        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap bg-taxi text-ink">📊 <span class="hidden lg:inline">Vue d'ensemble</span></a>
-        <a href="#courses" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🚕 <span class="hidden lg:inline">Courses</span></a>
-        <a href="{{ route('admin.users') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">👥 <span class="hidden lg:inline">Utilisateurs</span></a>
-        <a href="{{ route('admin.activity-logs') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">📋 <span class="hidden lg:inline">Journal d'activité</span></a>
-        <a href="#paiements" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">💰 <span class="hidden lg:inline">Paiements</span></a>
+        <x-dashboard-nav-link :href="route('admin.dashboard')" icon="chart-bar" label="Vue d'ensemble" :active="true" />
+        <x-dashboard-nav-link href="#courses" icon="taxi" label="Courses" />
+        <x-dashboard-nav-link :href="route('admin.users')" icon="users" label="Utilisateurs" />
+        <x-dashboard-nav-link :href="route('admin.activity-logs')" icon="clipboard-document-list" label="Journal d'activité" />
+        <x-dashboard-nav-link href="#paiements" icon="banknotes" label="Paiements" />
       </nav>
       <div class="hidden lg:block border-t border-gray-800 pt-4 mt-4">
         <form method="POST" action="{{ route('logout') }}">
           @csrf
-          <button type="submit" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold text-gray-400 hover:bg-gray-800 hover:text-white transition">🚪 Déconnexion</button>
+          <button type="submit" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold text-gray-400 hover:bg-gray-800 hover:text-white transition"><x-icon name="arrow-right-on-rectangle" class="w-5 h-5 shrink-0" /> Déconnexion</button>
         </form>
       </div>
     </aside>
 
-    <main class="p-7 lg:px-9">
+    <main class="p-4 sm:p-7 lg:px-9">
       <div class="flex justify-between items-center mb-7 flex-wrap gap-3">
         <div><h1 class="text-2xl font-extrabold">Administration</h1><p class="text-gray-500">Pilotage de la plateforme en temps réel.</p></div>
         <div class="flex gap-3 items-center"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700"><span class="w-2 h-2 rounded-full bg-green-500"></span> Système opérationnel</span><div class="w-10 h-10 rounded-full bg-taxi grid place-items-center font-extrabold text-ink">{{ strtoupper(substr(auth()->user()->firstname, 0, 1).substr(auth()->user()->lastname, 0, 1)) }}</div></div>
@@ -95,7 +95,7 @@
                 <tr class="border-t border-gray-200">
                   <td class="px-4 py-3">{{ $driver->firstname }} {{ $driver->lastname }}</td>
                   <td class="px-4 py-3">{{ number_format($driver->completed_rides_count, 0, ',', ' ') }}</td>
-                  <td class="px-4 py-3">{{ $driver->driverProfile?->rating ? number_format((float) $driver->driverProfile->rating, 2).'★' : '—' }}</td>
+                  <td class="px-4 py-3">@if ($driver->driverProfile?->rating)<span class="inline-flex items-center gap-1">{{ number_format((float) $driver->driverProfile->rating, 2) }}<x-icon name="star-solid" class="w-4 h-4 text-taxi" /></span>@else—@endif</td>
                   <td class="px-4 py-3">
                     @if ($driver->driverProfile?->is_online)
                       <span class="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">En ligne</span>

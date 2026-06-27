@@ -11,14 +11,14 @@
         <p class="text-gray-300 mt-4 max-w-sm">Créez votre compte gratuit et commandez votre première course dès maintenant.</p>
         <div class="flex gap-10 mt-8">
           <div><strong class="block text-3xl text-taxi">120k+</strong><span class="text-gray-400 text-sm">Utilisateurs</span></div>
-          <div><strong class="block text-3xl text-taxi">4.9★</strong><span class="text-gray-400 text-sm">Satisfaction</span></div>
+          <div><div class="inline-flex items-center gap-1"><strong class="text-3xl text-taxi">4.9</strong><x-icon name="star-solid" class="w-6 h-6 text-taxi" /></div><span class="text-gray-400 text-sm">Satisfaction</span></div>
         </div>
       </div>
       <p class="text-gray-500 text-sm">© {{ date('Y') }} {{ config('app.name', 'KinTaxiBooking') }}</p>
     </aside>
 
-    <main class="flex items-center justify-center p-10">
-      <form method="POST" action="{{ route('register.store') }}" class="w-full max-w-md bg-white rounded-2xl p-10 shadow-lg2">
+    <main class="flex items-center justify-center p-5 sm:p-10">
+      <form method="POST" action="{{ route('register.store') }}" class="w-full max-w-md bg-white rounded-2xl p-6 sm:p-10 shadow-lg2">
         @csrf
         <h1 class="text-3xl font-extrabold">Créer un compte</h1>
         <p class="text-sm text-gray-500 mb-4">Gratuit et sans engagement.</p>
@@ -33,25 +33,25 @@
           </div>
         @endif
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="mb-4"><label class="block font-semibold mb-1.5 text-sm">Prénom</label><input name="firstname" value="{{ old('firstname') }}" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Jean" /></div>
           <div class="mb-4"><label class="block font-semibold mb-1.5 text-sm">Nom</label><input name="lastname" value="{{ old('lastname') }}" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Dupont" /></div>
         </div>
         <div class="mb-4">
           <label class="block font-semibold mb-1.5 text-sm">Adresse e-mail</label>
-          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">✉️</span><input type="email" name="email" value="{{ old('email') }}" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="vous@email.com" /></div>
+          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><x-icon name="envelope" class="w-5 h-5" /></span><input type="email" name="email" value="{{ old('email') }}" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="vous@email.com" /></div>
         </div>
         <div class="mb-4">
           <label class="block font-semibold mb-1.5 text-sm">Téléphone</label>
-          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">📱</span><input type="tel" name="phone" value="{{ old('phone') }}" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="06 12 34 56 78" /></div>
+          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><x-icon name="device-phone-mobile" class="w-5 h-5" /></span><input type="tel" name="phone" value="{{ old('phone') }}" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="06 12 34 56 78" /></div>
         </div>
         <div class="mb-4">
           <label class="block font-semibold mb-1.5 text-sm">Mot de passe</label>
-          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">🔒</span><input type="password" name="password" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="8 caractères minimum" /></div>
+          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><x-icon name="lock-closed" class="w-5 h-5" /></span><input type="password" name="password" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="8 caractères minimum" /></div>
         </div>
         <div class="mb-4">
           <label class="block font-semibold mb-1.5 text-sm">Confirmer le mot de passe</label>
-          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">🔒</span><input type="password" name="password_confirmation" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Retapez le mot de passe" /></div>
+          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><x-icon name="lock-closed" class="w-5 h-5" /></span><input type="password" name="password_confirmation" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="Retapez le mot de passe" /></div>
         </div>
         <div class="mb-4">
           <label class="block font-semibold mb-1.5 text-sm">Type de compte</label>

@@ -10,23 +10,23 @@
     <aside class="bg-ink text-gray-300 p-5 flex lg:flex-col gap-1 overflow-x-auto">
       @include('partials.brand-logo', ['class' => 'hidden lg:flex items-center gap-2.5 font-black text-2xl text-white mb-8 px-2'])
       <nav class="flex lg:flex-col gap-1 flex-1">
-        <a href="{{ route('user.dashboardDriver') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap bg-taxi text-ink">📊 <span class="hidden lg:inline">Tableau de bord</span></a>
-        <a href="#demandes" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🔔 <span class="hidden lg:inline">Demandes</span></a>
-        <a href="{{ route('suivi') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🗺️ <span class="hidden lg:inline">Course active</span></a>
-        <a href="{{ route('rides.index') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🕓 <span class="hidden lg:inline">Mes courses</span></a>
-        <a href="#revenus" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">💰 <span class="hidden lg:inline">Revenus</span></a>
-        <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">👤 <span class="hidden lg:inline">Profil</span></a>
-        <a href="{{ route('contact') }}" class="flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold whitespace-nowrap hover:bg-gray-800 hover:text-white transition">🛟 <span class="hidden lg:inline">Support</span></a>
+        <x-dashboard-nav-link :href="route('user.dashboardDriver')" icon="chart-bar" label="Tableau de bord" :active="true" />
+        <x-dashboard-nav-link href="#demandes" icon="bell" label="Demandes" />
+        <x-dashboard-nav-link :href="route('suivi')" icon="map" label="Course active" />
+        <x-dashboard-nav-link :href="route('rides.index')" icon="clock" label="Mes courses" />
+        <x-dashboard-nav-link href="#revenus" icon="banknotes" label="Revenus" />
+        <x-dashboard-nav-link :href="route('profile.edit')" icon="user" label="Profil" />
+        <x-dashboard-nav-link :href="route('contact')" icon="lifebuoy" label="Support" />
       </nav>
       <div class="hidden lg:block border-t border-gray-800 pt-4 mt-4">
         <form method="POST" action="{{ route('logout') }}">
           @csrf
-          <button type="submit" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold text-gray-400 hover:bg-gray-800 hover:text-white transition">🚪 Déconnexion</button>
+          <button type="submit" class="w-full flex items-center gap-3 px-3.5 py-3 rounded-lg font-semibold text-gray-400 hover:bg-gray-800 hover:text-white transition"><x-icon name="arrow-right-on-rectangle" class="w-5 h-5 shrink-0" /> Déconnexion</button>
         </form>
       </div>
     </aside>
 
-    <main class="p-7 lg:px-9">
+    <main class="p-4 sm:p-7 lg:px-9">
       <div class="flex justify-between items-center mb-7 flex-wrap gap-3">
         <div>
           <h1 class="text-2xl font-extrabold">Bonjour, {{ auth()->user()->firstname }} 🚖</h1>
@@ -55,25 +55,25 @@
         <div class="bg-white rounded-xl p-5 shadow-xs border border-gray-200"><div class="text-gray-500 text-sm">Revenus du jour</div><div class="text-3xl font-extrabold mt-1">@fc($revenueToday)</div><div class="text-gray-500 text-sm mt-1.5">{{ now()->translatedFormat('d M') }}</div></div>
         <div class="bg-white rounded-xl p-5 shadow-xs border border-gray-200"><div class="text-gray-500 text-sm">Courses aujourd'hui</div><div class="text-3xl font-extrabold mt-1">{{ number_format($ridesToday, 0, ',', ' ') }}</div><div class="text-gray-500 text-sm mt-1.5">terminées</div></div>
         <div class="bg-white rounded-xl p-5 shadow-xs border border-gray-200"><div class="text-gray-500 text-sm">Total courses</div><div class="text-3xl font-extrabold mt-1">{{ number_format($completedTotal, 0, ',', ' ') }}</div><div class="text-gray-500 text-sm mt-1.5">depuis le début</div></div>
-        <div class="bg-white rounded-xl p-5 shadow-xs border border-gray-200"><div class="text-gray-500 text-sm">Note</div><div class="text-3xl font-extrabold mt-1">{{ $profile?->rating ? number_format((float) $profile->rating, 2).'★' : '—' }}</div><div class="text-gray-500 text-sm mt-1.5">{{ number_format($ratingsCount, 0, ',', ' ') }} avis</div></div>
+        <div class="bg-white rounded-xl p-5 shadow-xs border border-gray-200"><div class="text-gray-500 text-sm">Note</div><div class="text-3xl font-extrabold mt-1 inline-flex items-center gap-1">@if ($profile?->rating){{ number_format((float) $profile->rating, 2) }}<x-icon name="star-solid" class="w-5 h-5 text-taxi" />@else—@endif</div><div class="text-gray-500 text-sm mt-1.5">{{ number_format($ratingsCount, 0, ',', ' ') }} avis</div></div>
       </div>
 
       <!-- Demandes -->
       <div id="demandes" class="bg-white rounded-2xl p-6 shadow-soft border border-gray-200 border-l-4 border-l-taxi mb-6">
-        <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold">🔔 Demandes de courses disponibles</h2><span class="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">{{ $pendingRequests->count() }} en attente</span></div>
+        <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold inline-flex items-center gap-2"><x-icon name="bell" class="w-5 h-5 text-taxi-dark" /> Demandes de courses disponibles</h2><span class="inline-flex px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">{{ $pendingRequests->count() }} en attente</span></div>
         @forelse ($pendingRequests as $req)
           <div class="flex justify-between items-center flex-wrap gap-4 py-4 @if (! $loop->last) border-b border-gray-100 @endif">
             <div class="min-w-[220px]">
-              <div class="flex justify-between gap-6"><span class="text-gray-500">📍 Prise en charge</span><strong class="text-right">{{ \Illuminate\Support\Str::before($req->pickup_addr, ',') }}</strong></div>
-              <div class="flex justify-between gap-6 mt-1"><span class="text-gray-500">🏁 Destination</span><strong class="text-right">{{ \Illuminate\Support\Str::before($req->dropoff_addr, ',') }}</strong></div>
-              <div class="flex justify-between gap-6 mt-1"><span class="text-gray-500">💰 Estimation</span><strong class="text-taxi-dark">@fc($req->price)@if ($req->distance_km) · {{ number_format((float) $req->distance_km, 1, ',', ' ') }} km @endif</strong></div>
+              <div class="flex justify-between gap-6"><span class="text-gray-500 inline-flex items-center gap-1.5"><x-icon name="map-pin" class="w-4 h-4" /> Prise en charge</span><strong class="text-right">{{ \Illuminate\Support\Str::before($req->pickup_addr, ',') }}</strong></div>
+              <div class="flex justify-between gap-6 mt-1"><span class="text-gray-500 inline-flex items-center gap-1.5"><x-icon name="flag" class="w-4 h-4" /> Destination</span><strong class="text-right">{{ \Illuminate\Support\Str::before($req->dropoff_addr, ',') }}</strong></div>
+              <div class="flex justify-between gap-6 mt-1"><span class="text-gray-500 inline-flex items-center gap-1.5"><x-icon name="banknotes" class="w-4 h-4" /> Estimation</span><strong class="text-taxi-dark">@fc($req->price)@if ($req->distance_km) · {{ number_format((float) $req->distance_km, 1, ',', ' ') }} km @endif</strong></div>
             </div>
             <div class="flex gap-3">
               <a href="{{ route('rides.show', $req) }}" class="inline-flex px-6 py-3 rounded-full font-bold border-2 border-gray-300 hover:border-ink hover:bg-ink hover:text-white transition">Détails</a>
               <form method="POST" action="{{ route('rides.accept', $req) }}">
                 @csrf
                 @method('PATCH')
-                <button type="submit" class="inline-flex px-6 py-3 rounded-full font-bold bg-green-600 text-white hover:bg-green-700 transition">Accepter ✓</button>
+                <button type="submit" class="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold bg-green-600 text-white hover:bg-green-700 transition"><x-icon name="check" class="w-5 h-5" /> Accepter</button>
               </form>
             </div>
           </div>

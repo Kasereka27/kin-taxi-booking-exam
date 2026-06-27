@@ -30,7 +30,7 @@ class PaymentSucceeded extends Notification implements ShouldQueue
     {
         return [
             'type' => 'payment_succeeded',
-            'icon' => '✅',
+            'icon' => 'check-circle',
             'title' => 'Paiement confirmé',
             'message' => 'Paiement de '.Money::fc($this->payment->amount).' confirmé pour la course #'.Ride::referenceFor($this->payment->ride_id).'.',
             'url' => route('rides.show', $this->payment->ride_id),

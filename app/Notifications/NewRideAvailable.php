@@ -41,7 +41,7 @@ class NewRideAvailable extends Notification implements ShouldQueue
     {
         return [
             'type' => 'new_ride_available',
-            'icon' => '🆕',
+            'icon' => 'bell',
             'title' => 'Nouvelle course disponible',
             'message' => $this->ride->pickup_addr.' → '.$this->ride->dropoff_addr.' · '.Money::fc($this->ride->price),
             'url' => route('rides.show', $this->ride),

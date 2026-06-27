@@ -3,13 +3,13 @@
 @section('title', 'Contact')
 
 @section('content')
-<section class="py-12 bg-ink text-white text-center">
-    <div class="max-w-6xl mx-auto px-5"><span class="inline-block uppercase tracking-widest text-xs font-bold text-taxi-dark bg-taxi/15 px-3.5 py-1.5 rounded-full">Nous contacter</span><h1 class="mt-4 text-3xl font-extrabold">Une question ? On est là 24/7</h1></div>
+<section class="py-8 sm:py-12 bg-ink text-white text-center">
+    <div class="max-w-6xl mx-auto px-4 sm:px-5"><span class="inline-block uppercase tracking-widest text-xs font-bold text-taxi-dark bg-taxi/15 px-3.5 py-1.5 rounded-full">Nous contacter</span><h1 class="mt-4 text-2xl sm:text-3xl font-extrabold">Une question ? On est là 24/7</h1></div>
   </section>
 
-  <section class="py-20">
-    <div class="max-w-6xl mx-auto px-5 grid lg:grid-cols-2 gap-6 items-start">
-      <form method="POST" action="{{ route('contact.store') }}" class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200">
+  <section class="py-12 sm:py-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-5 grid lg:grid-cols-2 gap-6 items-start">
+      <form method="POST" action="{{ route('contact.store') }}" class="bg-white rounded-2xl p-5 sm:p-7 shadow-soft border border-gray-200">
         @csrf
         <h3 class="text-lg font-bold mb-4">Envoyez-nous un message</h3>
 
@@ -27,7 +27,7 @@
           </div>
         @endif
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="mb-4"><label class="block font-semibold mb-1.5 text-sm">Nom</label><input name="name" value="{{ old('name') }}" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" /></div>
           <div class="mb-4"><label class="block font-semibold mb-1.5 text-sm">E-mail</label><input type="email" name="email" value="{{ old('email') }}" required class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" /></div>
         </div>
@@ -46,13 +46,13 @@
       </form>
 
       <div>
-        <div class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200 mb-6">
+        <div class="bg-white rounded-2xl p-5 sm:p-7 shadow-soft border border-gray-200 mb-6">
           <h3 class="text-lg font-bold mb-4">Coordonnées</h3>
-          <div class="flex gap-3 mb-4 items-center"><span class="text-2xl">📞</span><div><strong>+243 900 000 000</strong><div class="text-gray-500 text-sm">Support 24h/24</div></div></div>
-          <div class="flex gap-3 mb-4 items-center"><span class="text-2xl">✉️</span><div><strong>support@kintaxibooking.com</strong><div class="text-gray-500 text-sm">Réponse sous 24h</div></div></div>
-          <div class="flex gap-3 items-center"><span class="text-2xl">📍</span><div><strong>Kinshasa, RDC</strong><div class="text-gray-500 text-sm">République Démocratique du Congo</div></div></div>
+          <div class="flex gap-3 mb-4 items-center"><span class="w-10 h-10 rounded-xl bg-taxi/20 grid place-items-center text-taxi-dark shrink-0"><x-icon name="phone" class="w-5 h-5" /></span><div><strong>+243 900 000 000</strong><div class="text-gray-500 text-sm">Support 24h/24</div></div></div>
+          <div class="flex gap-3 mb-4 items-center"><span class="w-10 h-10 rounded-xl bg-taxi/20 grid place-items-center text-taxi-dark shrink-0"><x-icon name="envelope" class="w-5 h-5" /></span><div><strong>support@kintaxibooking.com</strong><div class="text-gray-500 text-sm">Réponse sous 24h</div></div></div>
+          <div class="flex gap-3 items-center"><span class="w-10 h-10 rounded-xl bg-taxi/20 grid place-items-center text-taxi-dark shrink-0"><x-icon name="map-pin" class="w-5 h-5" /></span><div><strong>Kinshasa, RDC</strong><div class="text-gray-500 text-sm">République Démocratique du Congo</div></div></div>
         </div>
-        <div class="bg-white rounded-2xl p-7 shadow-soft border border-gray-200">
+        <div class="bg-white rounded-2xl p-5 sm:p-7 shadow-soft border border-gray-200">
           <h3 class="text-lg font-bold mb-4">Questions fréquentes</h3>
           <details class="py-2.5 border-b border-gray-100"><summary class="cursor-pointer font-semibold">Comment annuler une course ?</summary><p class="text-gray-500 mt-2">Depuis l'écran de suivi, cliquez sur « Annuler la course ». Gratuit dans les 5 premières minutes.</p></details>
           <details class="py-2.5 border-b border-gray-100"><summary class="cursor-pointer font-semibold">Quels moyens de paiement ?</summary><p class="text-gray-500 mt-2">Mobile Money (M-Pesa, Airtel, Orange) via Labyrinthe, en francs congolais.</p></details>

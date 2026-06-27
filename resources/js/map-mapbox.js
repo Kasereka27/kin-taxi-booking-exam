@@ -1,5 +1,6 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+import { createMarkerElement } from "./map-markers.js";
 import { readTrackingData, showMapSetupMessage, startTrackingSession } from "./map-shared.js";
 
 /** @param {[number, number]} latLng [lat, lng] */
@@ -7,14 +8,6 @@ function toLngLat([lat, lng]) {
   return [lng, lat];
 }
 
-function createEmojiElement(emoji) {
-  const el = document.createElement("div");
-  el.style.fontSize = "26px";
-  el.style.lineHeight = "1";
-  el.style.filter = "drop-shadow(0 2px 3px rgba(0,0,0,.35))";
-  el.textContent = emoji;
-  return el;
-}
 
 export function initMapboxTracking(container) {
   const token = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
@@ -54,8 +47,8 @@ export function initMapboxTracking(container) {
         );
         map.fitBounds(bounds, { padding, duration: 0 });
       },
-      addMarker(latLng, emoji, title) {
-        const marker = new mapboxgl.Marker({ element: createEmojiElement(emoji) })
+      addMarker(latLng, markerType, title) {
+        const marker = new mapboxgl.Marker({ element: createMarkerElement(markerType) })
           .setLngLat(toLngLat(latLng))
           .addTo(map);
         if (title) {
@@ -70,7 +63,7 @@ export function initMapboxTracking(container) {
       mapAdapter,
       tracking,
       (driverStart) => {
-        const marker = new mapboxgl.Marker({ element: createEmojiElement("🚕") })
+        const marker = new mapboxgl.Marker({ element: createMarkerElement("driver") })
           .setLngLat(toLngLat(driverStart))
           .setPopup(
             new mapboxgl.Popup({ offset: 20, closeButton: false }).setText("Votre chauffeur"),

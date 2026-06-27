@@ -10,16 +10,16 @@
         <h2 class="text-4xl font-black leading-tight">Bon retour parmi nous.</h2>
         <p class="text-gray-300 mt-4 max-w-sm">Connectez-vous pour réserver une course, suivre votre chauffeur et consulter votre historique.</p>
         <ul class="mt-8 space-y-2 text-gray-300">
-          <li class="flex gap-2.5"><span class="text-green-400 font-bold">✓</span> Suivi en temps réel de vos trajets</li>
-          <li class="flex gap-2.5"><span class="text-green-400 font-bold">✓</span> Historique et reçus en un clic</li>
-          <li class="flex gap-2.5"><span class="text-green-400 font-bold">✓</span> Paiement sécurisé enregistré</li>
+          <li class="flex gap-2.5 items-start"><x-icon name="check" class="w-5 h-5 text-green-400 shrink-0" /> Suivi en temps réel de vos trajets</li>
+          <li class="flex gap-2.5 items-start"><x-icon name="check" class="w-5 h-5 text-green-400 shrink-0" /> Historique et reçus en un clic</li>
+          <li class="flex gap-2.5 items-start"><x-icon name="check" class="w-5 h-5 text-green-400 shrink-0" /> Paiement sécurisé enregistré</li>
         </ul>
       </div>
       <p class="text-gray-500 text-sm">© {{ date('Y') }} {{ config('app.name', 'KinTaxiBooking') }}</p>
     </aside>
 
-    <main class="flex items-center justify-center p-10">
-      <form method="POST" action="{{ route('login.store') }}" class="w-full max-w-md bg-white rounded-2xl p-10 shadow-lg2">
+    <main class="flex items-center justify-center p-5 sm:p-10">
+      <form method="POST" action="{{ route('login.store') }}" class="w-full max-w-md bg-white rounded-2xl p-6 sm:p-10 shadow-lg2">
         @csrf
         <h1 class="text-3xl font-extrabold">Connexion</h1>
         <p class="text-sm text-gray-500 mb-4">Accédez à votre espace {{ config('app.name', 'KinTaxiBooking') }}.</p>
@@ -40,11 +40,11 @@
 
         <div class="mb-4">
           <label class="block font-semibold mb-1.5 text-sm">Adresse e-mail</label>
-          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">✉️</span><input type="email" name="email" value="{{ old('email') }}" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="vous@email.com" /></div>
+          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><x-icon name="envelope" class="w-5 h-5" /></span><input type="email" name="email" value="{{ old('email') }}" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="vous@email.com" /></div>
         </div>
         <div class="mb-4">
           <label class="block font-semibold mb-1.5 text-sm">Mot de passe</label>
-          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">🔒</span><input type="password" name="password" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="••••••••" /></div>
+          <div class="relative"><span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"><x-icon name="lock-closed" class="w-5 h-5" /></span><input type="password" name="password" required class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" placeholder="••••••••" /></div>
         </div>
         <div class="flex justify-between items-center mb-4">
           <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="remember" /> Se souvenir de moi</label>

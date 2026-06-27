@@ -29,7 +29,7 @@ class RideCancelled extends Notification implements ShouldQueue
     {
         return [
             'type' => 'ride_cancelled',
-            'icon' => '🚫',
+            'icon' => 'no-symbol',
             'title' => 'Course annulée',
             'message' => 'La course #'.$this->ride->reference().' a été annulée par '.$this->actorLabel().'.',
             'url' => route('rides.show', $this->ride),

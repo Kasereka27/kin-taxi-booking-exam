@@ -28,7 +28,7 @@ class RideAccepted extends Notification implements ShouldQueue
     {
         return [
             'type' => 'ride_accepted',
-            'icon' => '🚗',
+            'icon' => 'car',
             'title' => 'Course acceptée',
             'message' => $this->driverName().' a accepté votre course #'.$this->ride->reference().'.',
             'url' => route('rides.show', $this->ride),

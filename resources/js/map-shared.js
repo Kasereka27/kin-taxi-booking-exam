@@ -1,4 +1,5 @@
 import { getEcho } from "./echo.js";
+import { getMarkerSvg } from "./map-markers.js";
 
 /** @typedef {{ setLatLng: (latLng: [number, number]) => void }} DriverHandle */
 /** @typedef {{ panTo: (latLng: [number, number]) => void, fitPoints: (points: [number, number][], padding?: number) => void }} MapAdapter */
@@ -33,7 +34,7 @@ export function showMapSetupMessage(container, provider) {
   container.innerHTML = `
     <div class="flex h-full min-h-[240px] items-center justify-center bg-gray-100 p-8 text-center">
       <div class="max-w-md">
-        <p class="text-4xl mb-3">🗺️</p>
+        <div class="flex justify-center mb-3 text-gray-400">${getMarkerSvg("map")}</div>
         <p class="font-bold text-ink">Carte ${provider === "mapbox" ? "Mapbox" : "Google Maps"} non configurée</p>
         <p class="text-sm text-gray-500 mt-2">Ajoutez <code class="bg-white px-1 rounded">${keyName}</code> dans votre fichier <code class="bg-white px-1 rounded">.env</code>, puis relancez Vite.</p>
       </div>
@@ -152,8 +153,8 @@ export function startTrackingSession(
 ) {
   const { pickup, dropoff, driverStart, shouldAnimate, status, rideId, useWebSocket } = tracking;
 
-  mapAdapter.addMarker(pickup, "📍", "Point de prise en charge");
-  mapAdapter.addMarker(dropoff, "🏁", "Destination");
+  mapAdapter.addMarker(pickup, "pickup", "Point de prise en charge");
+  mapAdapter.addMarker(dropoff, "dropoff", "Destination");
 
   if (!shouldAnimate) {
     mapAdapter.fitPoints([pickup, dropoff]);

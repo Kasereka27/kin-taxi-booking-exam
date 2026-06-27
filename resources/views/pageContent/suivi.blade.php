@@ -29,7 +29,7 @@
   <div class="grid lg:grid-cols-[1fr_380px] lg:h-[calc(100vh-72px)]">
     <div id="map" class="w-full h-[50vh] lg:h-full bg-gray-200 z-0"></div>
 
-    <aside class="bg-white border-l border-gray-200 p-7 overflow-y-auto">
+    <aside class="bg-white border-l border-gray-200 p-5 sm:p-7 overflow-y-auto">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold">Course <span class="text-gray-500">#{{ $ride->reference() }}</span></h2>
         <span id="ride-status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold {{ $statusStyles[1] }}">{{ $statusStyles[0] }}</span>
@@ -52,7 +52,7 @@
             <strong>{{ $driver->firstname }} {{ $driver->lastname }}</strong>
             <div class="text-sm text-gray-500">
               @if ($profile?->rating)
-                ⭐ {{ number_format((float) $profile->rating, 2, ',', ' ') }}
+                <span class="inline-flex items-center gap-1"><x-icon name="star-solid" class="w-4 h-4 text-taxi" /> {{ number_format((float) $profile->rating, 2, ',', ' ') }}</span>
               @else
                 Chauffeur vérifié
               @endif
@@ -67,8 +67,8 @@
         @endif
         <div class="flex gap-3 mb-6">
           @if ($driver->phone)
-            <a href="tel:{{ $driver->phone }}" class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-full font-bold text-sm bg-ink text-white hover:bg-ink-soft transition">📞 Appeler</a>
-            <a href="sms:{{ $driver->phone }}" class="flex-1 inline-flex items-center justify-center px-4 py-2 rounded-full font-bold text-sm border-2 border-gray-300 hover:border-ink hover:bg-ink hover:text-white transition">💬 Message</a>
+            <a href="tel:{{ $driver->phone }}" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full font-bold text-sm bg-ink text-white hover:bg-ink-soft transition"><x-icon name="phone" class="w-4 h-4" /> Appeler</a>
+            <a href="sms:{{ $driver->phone }}" class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full font-bold text-sm border-2 border-gray-300 hover:border-ink hover:bg-ink hover:text-white transition"><x-icon name="chat-bubble-left" class="w-4 h-4" /> Message</a>
           @endif
         </div>
       @else
@@ -101,8 +101,8 @@
       </div>
 
       <div class="h-px bg-gray-200 my-5"></div>
-      <div class="flex justify-between"><span class="text-gray-500">📍 Départ</span><strong class="text-right max-w-[60%]">{{ $ride->pickup_addr }}</strong></div>
-      <div class="flex justify-between mt-1"><span class="text-gray-500">🏁 Arrivée</span><strong class="text-right max-w-[60%]">{{ $ride->dropoff_addr }}</strong></div>
+      <div class="flex justify-between gap-3"><span class="text-gray-500 inline-flex items-center gap-1.5 shrink-0"><x-icon name="map-pin" class="w-4 h-4" /> Départ</span><strong class="text-right max-w-[60%]">{{ $ride->pickup_addr }}</strong></div>
+      <div class="flex justify-between gap-3 mt-1"><span class="text-gray-500 inline-flex items-center gap-1.5 shrink-0"><x-icon name="flag" class="w-4 h-4" /> Arrivée</span><strong class="text-right max-w-[60%]">{{ $ride->dropoff_addr }}</strong></div>
       <div class="flex justify-between mt-1 text-lg"><span>Total</span><strong class="text-taxi-dark">@fc($ride->price)</strong></div>
 
       @can('update', $ride)
@@ -122,7 +122,7 @@
   <section class="py-16">
     <div class="max-w-lg mx-auto px-5 text-center">
       <div class="bg-white rounded-2xl p-8 shadow-soft border border-gray-200">
-        <div class="text-4xl mb-3">✅</div>
+        <div class="flex justify-center mb-3 text-green-600"><x-icon name="check-circle" class="w-14 h-14" /></div>
         <h1 class="text-xl font-extrabold">Course #{{ $inactiveRide->reference() }}</h1>
         <p class="text-gray-500 mt-2">Cette course n'est plus suivie en direct (statut : {{ $inactiveRide->statusLabel() }}).</p>
         <a href="{{ route('rides.show', $inactiveRide) }}" class="mt-6 inline-flex px-6 py-3 rounded-full font-bold bg-taxi text-ink shadow-taxi hover:bg-taxi-dark transition">Voir la course</a>
@@ -133,7 +133,7 @@
   <section class="py-16">
     <div class="max-w-lg mx-auto px-5 text-center">
       <div class="bg-white rounded-2xl p-8 shadow-soft border border-gray-200">
-        <div class="text-4xl mb-3">📡</div>
+        <div class="flex justify-center mb-3 text-taxi-dark"><x-icon name="signal" class="w-14 h-14" /></div>
         <h1 class="text-xl font-extrabold">Aucune course à suivre</h1>
         <p class="text-gray-500 mt-2">
           @auth
