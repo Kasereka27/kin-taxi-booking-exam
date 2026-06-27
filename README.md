@@ -167,7 +167,13 @@ Documentation complète : **[docs/api.md](docs/api.md)**
 
 ## Schéma de base de données
 
-Documentation détaillée : **[docs/database-schema.md](docs/database-schema.md)** · API : **[docs/api.md](docs/api.md)**
+Documentation détaillée : **[docs/database-schema.md](docs/database-schema.md)** · API : **[docs/api.md](docs/api.md)** · **PDF : [docs/KinTaxiBooking-Documentation.pdf](docs/KinTaxiBooking-Documentation.pdf)**
+
+Pour régénérer le PDF après modification du projet :
+
+```bash
+php artisan docs:generate-pdf
+```
 
 ---
 
@@ -229,7 +235,9 @@ kin-taxi-booking-exam/
 ├── database/migrations/
 ├── database/seeders/
 ├── docs/
-│   └── database-schema.md
+│   ├── KinTaxiBooking-Documentation.pdf
+│   ├── database-schema.md
+│   └── api.md
 ├── resources/views/
 ├── routes/web.php
 ├── routes/api.php
