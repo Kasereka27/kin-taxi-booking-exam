@@ -39,4 +39,22 @@ class RideTrackingController extends Controller
 
         return response()->json($tracking->trackingPayload($ride));
     }
+
+    public function updateClient(
+        UpdateRideTrackingRequest $request,
+        Ride $ride,
+        RideTrackingService $tracking,
+    ): JsonResponse {
+        $this->authorize('trackClient', $ride);
+
+        $ride = $tracking->updateClientPosition(
+            $ride,
+            (float) $request->validated('lat'),
+            (float) $request->validated('lng'),
+        );
+
+        return response()->json([
+            'status' => $ride->status,
+        ]);
+    }
 }

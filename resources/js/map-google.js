@@ -3,26 +3,27 @@ import {
   activeRouteEndpoints,
   applyDirectionsMeta,
   createDirectionsRenderer,
-  drawPreviewPolyline,
+  drawPathPolyline,
+  fetchBookedRoute,
   pathFromDirectionsResult,
+  PREVIEW_ROUTE_STYLE,
   requestDrivingRoute,
   toGoogleLatLng,
 } from "./map-google-directions.js";
 import { getMarkerSvg } from "./map-markers.js";
 import {
-  buildRoute,
   readTrackingData,
   showMapSetupMessage,
   startTrackingSession,
 } from "./map-shared.js";
 
-/** @type {{ map: google.maps.Map, renderer: google.maps.DirectionsRenderer, service: google.maps.DirectionsService, previewLines: google.maps.Polyline[] } | null} */
+/** @type {{ map: google.maps.Map, renderer: google.maps.DirectionsRenderer, service: google.maps.DirectionsService, bookedLine: google.maps.Polyline | null, previewLines: google.maps.Polyline[] } | null} */
 let routeLayer = null;
 
 /**
  * @param {google.maps.Map} map
  * @param {[number, number]} latLng
- * @param {'pickup'|'dropoff'|'driver'} markerType
+ * @param {'pickup'|'dropoff'|'driver'|'client'} markerType
  * @param {string} title
  */
 function addSvgMarker(map, latLng, markerType, title) {
@@ -44,6 +45,9 @@ function clearPreviewLines() {
     return;
   }
 
+  routeLayer.bookedLine?.setMap(null);
+  routeLayer.bookedLine = null;
+
   for (const line of routeLayer.previewLines) {
     line.setMap(null);
   }
@@ -63,59 +67,88 @@ async function renderGoogleRoute(map, tracking) {
       map,
       renderer: createDirectionsRenderer(map),
       service: new google.maps.DirectionsService(),
+      bookedLine: null,
       previewLines: [],
     };
   }
 
   clearPreviewLines();
 
+  let bookedPath = tracking.routePolyline ?? [];
+  let bookedResult = null;
+
+  if (!bookedPath.length) {
+    try {
+      const booked = await fetchBookedRoute(
+        routeLayer.service,
+        tracking.pickup,
+        tracking.dropoff,
+      );
+      bookedPath = booked.path;
+      bookedResult = booked.result;
+    } catch (error) {
+      console.warn("Itinéraire réservé indisponible via Directions API.", error);
+    }
+  }
+
+  if (bookedPath.length) {
+    routeLayer.bookedLine = drawPathPolyline(map, bookedPath, {
+      strokeColor: "#64748b",
+      strokeOpacity: 0.55,
+      strokeWeight: 5,
+    });
+
+    if (routeLayer.bookedLine) {
+      routeLayer.previewLines.push(routeLayer.bookedLine);
+    }
+  }
+
   const { origin, destination } = activeRouteEndpoints(tracking);
 
   try {
-    const activeResult = await requestDrivingRoute(routeLayer.service, origin, destination);
-    routeLayer.renderer.setDirections(activeResult);
-    applyDirectionsMeta(activeResult, tracking.status);
+    if (tracking.status === "course") {
+      const activeResult =
+        bookedResult ??
+        (await requestDrivingRoute(routeLayer.service, tracking.pickup, tracking.dropoff));
+      routeLayer.renderer.setDirections(activeResult);
+      applyDirectionsMeta(activeResult, tracking.status);
 
-    if (tracking.status !== "course") {
-      try {
-        const previewResult = await requestDrivingRoute(
-          routeLayer.service,
-          tracking.pickup,
-          tracking.dropoff,
-        );
-        const previewLine = drawPreviewPolyline(map, previewResult);
-        if (previewLine) {
-          routeLayer.previewLines.push(previewLine);
-        }
-      } catch {
-        // Aperçu optionnel — on ignore si indisponible.
-      }
+      return {
+        bookedPath,
+        simulationPath: pathFromDirectionsResult(activeResult).path,
+        pickupIndex: 0,
+      };
     }
 
-    const { path } = pathFromDirectionsResult(activeResult);
+    const approachResult = await requestDrivingRoute(routeLayer.service, origin, destination);
+    routeLayer.renderer.setDirections(approachResult);
+    applyDirectionsMeta(approachResult, tracking.status);
+
+    const approachPath = pathFromDirectionsResult(approachResult).path;
 
     return {
-      path,
-      pickupIndex: tracking.status === "course" ? 0 : path.length,
+      bookedPath,
+      simulationPath: approachPath.length ? approachPath : bookedPath,
+      pickupIndex: approachPath.length,
     };
   } catch (error) {
     console.warn("Directions API indisponible, tracé simplifié utilisé.", error);
     routeLayer.renderer.setDirections({ routes: [] });
 
-    const fallback = buildRoute(tracking.driverStart, tracking.pickup, tracking.dropoff, 60);
+    if (!bookedPath.length) {
+      bookedPath = [tracking.pickup, tracking.dropoff];
+      routeLayer.bookedLine = drawPathPolyline(map, bookedPath, PREVIEW_ROUTE_STYLE);
 
-    const fallbackLine = new google.maps.Polyline({
-      path: fallback.map(toGoogleLatLng),
-      geodesic: true,
-      strokeColor: "#64748b",
-      strokeOpacity: 0.5,
-      strokeWeight: 4,
-      map,
-    });
+      if (routeLayer.bookedLine) {
+        routeLayer.previewLines.push(routeLayer.bookedLine);
+      }
+    }
 
-    routeLayer.previewLines.push(fallbackLine);
-
-    return { path: fallback, pickupIndex: Math.floor(fallback.length / 3) };
+    return {
+      bookedPath,
+      simulationPath: bookedPath,
+      pickupIndex: 0,
+    };
   }
 }
 
@@ -129,8 +162,9 @@ async function refreshRouteForStatus(tracking) {
 
   const routeData = await renderGoogleRoute(routeLayer.map, tracking);
 
-  if (window.trackingRide && routeData.path.length) {
-    window.trackingRide.routePath = routeData.path;
+  if (window.trackingRide) {
+    window.trackingRide.routePath = routeData.simulationPath;
+    window.trackingRide.bookedRoutePath = routeData.bookedPath;
   }
 }
 
@@ -163,7 +197,10 @@ export async function initGoogleTracking(container, trackingEnabled = true) {
       map.panTo(toGoogleLatLng(latLng));
     },
     fitPoints(points, padding = 48) {
-      if (points.length === 0) return;
+      if (points.length === 0) {
+        return;
+      }
+
       const bounds = new google.maps.LatLngBounds();
       points.forEach((pt) => bounds.extend(toGoogleLatLng(pt)));
       map.fitBounds(bounds, padding);
@@ -175,7 +212,17 @@ export async function initGoogleTracking(container, trackingEnabled = true) {
 
   const routeData = tracking.shouldAnimate
     ? await renderGoogleRoute(map, tracking)
-    : { path: [], pickupIndex: null };
+    : { bookedPath: [], simulationPath: [], pickupIndex: null };
+
+  if (window.trackingRide) {
+    window.trackingRide.bookedRoutePath = routeData.bookedPath;
+  }
+
+  mapAdapter.fitPoints(
+    routeData.bookedPath.length
+      ? [...routeData.bookedPath, tracking.pickup, tracking.dropoff]
+      : [tracking.pickup, tracking.dropoff],
+  );
 
   startTrackingSession(
     mapAdapter,
@@ -190,12 +237,21 @@ export async function initGoogleTracking(container, trackingEnabled = true) {
       };
     },
     null,
-    routeData.path.length ? routeData.path : null,
+    routeData.simulationPath.length ? routeData.simulationPath : null,
     routeData.pickupIndex,
     (newStatus) => {
       if (newStatus === "course") {
         refreshRouteForStatus({ ...readTrackingData(), status: "course" });
       }
+    },
+    (clientStart) => {
+      const marker = addSvgMarker(map, clientStart, "client", "Client");
+
+      return {
+        setLatLng([lat, lng]) {
+          marker.setPosition(toGoogleLatLng([lat, lng]));
+        },
+      };
     },
   );
 }

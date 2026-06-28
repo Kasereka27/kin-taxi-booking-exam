@@ -1,26 +1,39 @@
 import { getEcho } from "./echo.js";
 import { getMarkerSvg } from "./map-markers.js";
 
-/** @typedef {{ setLatLng: (latLng: [number, number]) => void }} DriverHandle */
+/** @typedef {{ setLatLng: (latLng: [number, number]) => void }} MarkerHandle */
 /** @typedef {{ panTo: (latLng: [number, number]) => void, fitPoints: (points: [number, number][], padding?: number) => void }} MapAdapter */
+/** @typedef {{ driverMarker: MarkerHandle, clientMarker: MarkerHandle|null, createClientMarker: ((latLng: [number, number]) => MarkerHandle)|null, mapAdapter: MapAdapter, etaEl: HTMLElement|null, onStatusChange: ((status: string) => void)|null }} TrackingContext */
 
 /**
- * @returns {{ pickup: [number, number], dropoff: [number, number], driverStart: [number, number], shouldAnimate: boolean, status: string, rideId: number|null, useWebSocket: boolean }}
+ * @returns {{ pickup: [number, number], dropoff: [number, number], driverStart: [number, number], routePolyline: [number, number][]|null, shouldAnimate: boolean, status: string, rideId: number|null, useWebSocket: boolean }}
  */
 export function readTrackingData(trackingEnabled = true) {
   const data = window.trackingRide ?? {};
 
-  const pickup = /** @type {[number, number]} */ (data.pickup ?? [-4.3217, 15.3125]);
-  const dropoff = /** @type {[number, number]} */ (data.dropoff ?? [-4.3017, 15.3325]);
+  const pickup = /** @type {[number, number]} */ ([
+    Number(data.pickup?.[0] ?? -4.3217),
+    Number(data.pickup?.[1] ?? 15.3125),
+  ]);
+  const dropoff = /** @type {[number, number]} */ ([
+    Number(data.dropoff?.[0] ?? -4.3017),
+    Number(data.dropoff?.[1] ?? 15.3325),
+  ]);
   const driverStart = /** @type {[number, number]} */ (
-    data.driver ?? [pickup[0] - 0.018, pickup[1] - 0.012]
+    data.driver
+      ? [Number(data.driver[0]), Number(data.driver[1])]
+      : [pickup[0] - 0.018, pickup[1] - 0.012]
   );
+  const routePolyline = Array.isArray(data.routePolyline)
+    ? data.routePolyline.map((point) => /** @type {[number, number]} */ ([Number(point[0]), Number(point[1])]))
+    : null;
   const baseAnimate = data.animate ?? true;
 
   return {
     pickup,
     dropoff,
     driverStart,
+    routePolyline,
     shouldAnimate: baseAnimate && trackingEnabled,
     status: data.status ?? "assigned",
     rideId: data.rideId ?? null,
@@ -44,18 +57,40 @@ export function showMapSetupMessage(container, provider) {
 
 /**
  * @param {Record<string, unknown>} payload
- * @param {{ driverMarker: DriverHandle, mapAdapter: MapAdapter, etaEl: HTMLElement|null, onStatusChange: ((status: string) => void)|null }} ctx
+ * @param {TrackingContext} ctx
  */
 export function applyTrackingUpdate(payload, ctx) {
-  if (payload.lat == null || payload.lng == null) {
-    return;
+  const driverLat = payload.driver_lat ?? payload.lat;
+  const driverLng = payload.driver_lng ?? payload.lng;
+
+  if (driverLat != null && driverLng != null) {
+    const lat = Number(driverLat);
+    const lng = Number(driverLng);
+
+    ctx.driverMarker.setLatLng([lat, lng]);
+
+    if (!window.trackingRide?.isClient) {
+      ctx.mapAdapter.panTo([lat, lng]);
+    }
   }
 
-  const lat = Number(payload.lat);
-  const lng = Number(payload.lng);
+  const clientLat = payload.client_lat;
+  const clientLng = payload.client_lng;
 
-  ctx.driverMarker.setLatLng([lat, lng]);
-  ctx.mapAdapter.panTo([lat, lng]);
+  if (clientLat != null && clientLng != null) {
+    const lat = Number(clientLat);
+    const lng = Number(clientLng);
+
+    if (!ctx.clientMarker && ctx.createClientMarker) {
+      ctx.clientMarker = ctx.createClientMarker([lat, lng]);
+    } else if (ctx.clientMarker) {
+      ctx.clientMarker.setLatLng([lat, lng]);
+    }
+
+    if (window.trackingRide?.isDriver) {
+      ctx.mapAdapter.panTo([lat, lng]);
+    }
+  }
 
   if (ctx.etaEl && payload.eta_minutes != null) {
     ctx.etaEl.textContent = String(payload.eta_minutes);
@@ -132,9 +167,8 @@ function startPolling(showUrl, ctx, intervalMs = 4000) {
   window.__ktbTrackingPollTimer = window.setInterval(poll, intervalMs);
 }
 
-export function subscribeToTracking(rideId, driverMarker, mapAdapter, etaEl, onStatusChange = null) {
+export function subscribeToTracking(rideId, ctx) {
   const showUrl = window.trackingRide?.trackingShowUrl ?? null;
-  const ctx = { driverMarker, mapAdapter, etaEl, onStatusChange };
 
   if (showUrl) {
     fetchTrackingSnapshot(showUrl)
@@ -236,8 +270,11 @@ export function startTrackingSession(
   routeOverride = null,
   pickupIndex = null,
   onStatusChange = null,
+  createClientMarker = null,
 ) {
   const { pickup, dropoff, driverStart, shouldAnimate, status, rideId } = tracking;
+  const rideData = window.trackingRide ?? {};
+  const clientStart = /** @type {[number, number]|null} */ (rideData.client ?? null);
 
   mapAdapter.addMarker(pickup, "pickup", "Point de prise en charge");
   mapAdapter.addMarker(dropoff, "dropoff", "Destination");
@@ -249,13 +286,29 @@ export function startTrackingSession(
   }
 
   const driver = createDriverMarker(driverStart);
-  const route = routeOverride ?? buildRoute(driverStart, pickup, dropoff, 60);
+  const clientMarker =
+    clientStart && createClientMarker ? createClientMarker(clientStart) : null;
+  const route =
+    routeOverride ??
+    (tracking.routePolyline?.length
+      ? tracking.routePolyline
+      : buildRoute(driverStart, pickup, dropoff, 60));
 
   if (typeof drawRoute === "function") {
     drawRoute(route);
   }
 
-  mapAdapter.fitPoints(route.length ? route : [pickup, dropoff]);
+  const fitTargets = [pickup, dropoff, driverStart];
+  if (clientStart) {
+    fitTargets.push(clientStart);
+  }
+  if (tracking.routePolyline?.length) {
+    fitTargets.push(...tracking.routePolyline);
+  } else if (route.length) {
+    fitTargets.push(...route);
+  }
+
+  mapAdapter.fitPoints(fitTargets);
 
   if (window.trackingRide) {
     window.trackingRide.routePath = route;
@@ -270,6 +323,13 @@ export function startTrackingSession(
   setStep(initialStage === "assigned" ? "approche" : initialStage);
 
   if (rideId) {
-    subscribeToTracking(rideId, driver, mapAdapter, etaEl, onStatusChange);
+    subscribeToTracking(rideId, {
+      driverMarker: driver,
+      clientMarker,
+      createClientMarker,
+      mapAdapter,
+      etaEl,
+      onStatusChange,
+    });
   }
 }

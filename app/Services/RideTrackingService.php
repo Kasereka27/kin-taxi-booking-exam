@@ -46,19 +46,49 @@ class RideTrackingService
         return $ride;
     }
 
+    public function updateClientPosition(Ride $ride, float $lat, float $lng): Ride
+    {
+        $ride->update([
+            'client_lat' => $lat,
+            'client_lng' => $lng,
+            'client_location_updated_at' => now(),
+        ]);
+
+        $ride->refresh();
+
+        broadcast(new RideTrackingUpdated($ride));
+
+        return $ride;
+    }
+
     /**
-     * @return array{ride_id: int, status: string, lat: float|null, lng: float|null, eta_minutes: int}
+     * @return array{
+     *     ride_id: int,
+     *     status: string,
+     *     lat: float|null,
+     *     lng: float|null,
+     *     driver_lat: float|null,
+     *     driver_lng: float|null,
+     *     client_lat: float|null,
+     *     client_lng: float|null,
+     *     eta_minutes: int
+     * }
      */
     public function trackingPayload(Ride $ride): array
     {
         $ride->loadMissing(['driver.driverProfile']);
-        $coords = $ride->driverCoordinates();
+        $driverCoords = $ride->driverCoordinates();
+        $clientCoords = $ride->clientLiveCoordinates();
 
         return [
             'ride_id' => $ride->id,
             'status' => $ride->status,
-            'lat' => $coords[0] ?? null,
-            'lng' => $coords[1] ?? null,
+            'lat' => $driverCoords[0] ?? null,
+            'lng' => $driverCoords[1] ?? null,
+            'driver_lat' => $driverCoords[0] ?? null,
+            'driver_lng' => $driverCoords[1] ?? null,
+            'client_lat' => $clientCoords[0] ?? null,
+            'client_lng' => $clientCoords[1] ?? null,
             'eta_minutes' => $this->estimateEtaMinutes($ride),
         ];
     }
@@ -74,7 +104,7 @@ class RideTrackingService
         }
 
         $target = in_array($ride->status, ['assigned', 'approche'], true)
-            ? $ride->pickupCoordinates()
+            ? ($ride->clientLiveCoordinates() ?? $ride->pickupCoordinates())
             : $ride->dropoffCoordinates();
 
         $distanceKm = $this->distanceKm($coords[0], $coords[1], $target[0], $target[1]);
@@ -88,7 +118,7 @@ class RideTrackingService
             return;
         }
 
-        [$pickupLat, $pickupLng] = $ride->pickupCoordinates();
+        [$pickupLat, $pickupLng] = $ride->clientLiveCoordinates() ?? $ride->pickupCoordinates();
         $distToPickupKm = $this->distanceKm($lat, $lng, $pickupLat, $pickupLng);
 
         $newStatus = match ($ride->status) {

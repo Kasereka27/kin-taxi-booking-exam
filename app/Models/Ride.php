@@ -33,6 +33,9 @@ class Ride extends Model
         'dropoff_addr',
         'dropoff_lat',
         'dropoff_lng',
+        'route_polyline',
+        'client_lat',
+        'client_lng',
         'vehicle_type',
         'status',
         'price',
@@ -53,12 +56,16 @@ class Ride extends Model
             'pickup_lng' => 'decimal:7',
             'dropoff_lat' => 'decimal:7',
             'dropoff_lng' => 'decimal:7',
+            'route_polyline' => 'array',
+            'client_lat' => 'decimal:7',
+            'client_lng' => 'decimal:7',
             'price' => 'decimal:2',
             'distance_km' => 'decimal:2',
             'requested_at' => 'datetime',
             'accepted_at' => 'datetime',
             'completed_at' => 'datetime',
             'cancelled_at' => 'datetime',
+            'client_location_updated_at' => 'datetime',
         ];
     }
 
@@ -101,6 +108,31 @@ class Ride extends Model
             + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
 
         return round($earthRadius * 2 * atan2(sqrt($a), sqrt(1 - $a)), 2);
+    }
+
+    /**
+     * Distance cumulée le long d'un tracé [[lat, lng], ...].
+     *
+     * @param  list<array{0: float|int|string, 1: float|int|string}>  $path
+     */
+    public static function routeDistanceKm(array $path): float
+    {
+        if (count($path) < 2) {
+            return 0.0;
+        }
+
+        $total = 0.0;
+
+        for ($index = 1; $index < count($path); $index++) {
+            $total += self::distanceKmBetween(
+                (float) $path[$index - 1][0],
+                (float) $path[$index - 1][1],
+                (float) $path[$index][0],
+                (float) $path[$index][1],
+            );
+        }
+
+        return round($total, 2);
     }
 
     /**
@@ -241,6 +273,20 @@ class Ride extends Model
         [$lat, $lng] = $this->pickupCoordinates();
 
         return [$lat - 0.018, $lng - 0.012];
+    }
+
+    /**
+     * Position GPS live du client (null tant qu'il n'a pas partagé sa localisation).
+     *
+     * @return array{0: float, 1: float}|null
+     */
+    public function clientLiveCoordinates(): ?array
+    {
+        if ($this->client_lat !== null && $this->client_lng !== null) {
+            return [(float) $this->client_lat, (float) $this->client_lng];
+        }
+
+        return null;
     }
 
     /**

@@ -49,6 +49,7 @@
           </div>
           <input type="hidden" id="dropoff_lat" name="dropoff_lat" value="{{ old('dropoff_lat') }}">
           <input type="hidden" id="dropoff_lng" name="dropoff_lng" value="{{ old('dropoff_lng') }}">
+          <input type="hidden" id="route_polyline" name="route_polyline" value="{{ old('route_polyline') }}">
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="mb-4"><label class="block font-semibold mb-1.5 text-sm">Date</label><input type="date" name="date" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-hidden focus:border-taxi focus:ring-2 focus:ring-taxi/30 transition" /></div>

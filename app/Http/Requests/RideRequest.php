@@ -26,6 +26,7 @@ class RideRequest extends FormRequest
             'dropoff_addr' => ['required', 'string', 'max:255'],
             'dropoff_lat' => ['required', 'numeric', "between:{$bounds['lat_min']},{$bounds['lat_max']}"],
             'dropoff_lng' => ['required', 'numeric', "between:{$bounds['lng_min']},{$bounds['lng_max']}"],
+            'route_polyline' => ['nullable', 'string'],
             'vehicle_type' => ['required', 'in:eco,confort,van'],
         ];
     }
@@ -59,5 +60,42 @@ class RideRequest extends FormRequest
         if ($this->has('vehicleType') && ! $this->has('vehicle_type')) {
             $this->merge(['vehicle_type' => $this->input('vehicleType')]);
         }
+    }
+
+    /**
+     * @return list<array{0: float, 1: float}>|null
+     */
+    public function decodedRoutePolyline(): ?array
+    {
+        $raw = $this->input('route_polyline');
+
+        if (! is_string($raw) || trim($raw) === '') {
+            return null;
+        }
+
+        $decoded = json_decode($raw, true);
+
+        if (! is_array($decoded) || $decoded === []) {
+            return null;
+        }
+
+        $path = [];
+
+        foreach ($decoded as $point) {
+            if (! is_array($point) || count($point) < 2) {
+                return null;
+            }
+
+            $lat = (float) $point[0];
+            $lng = (float) $point[1];
+
+            if (! Ride::isWithinKinshasa($lat, $lng)) {
+                return null;
+            }
+
+            $path[] = [$lat, $lng];
+        }
+
+        return count($path) >= 2 ? $path : null;
     }
 }

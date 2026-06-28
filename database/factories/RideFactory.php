@@ -12,13 +12,51 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class RideFactory extends Factory
 {
     /**
+     * Repères Kinshasa cohérents entre adresse texte et coordonnées GPS.
+     *
+     * @var list<array{pickup_addr: string, pickup_lat: float, pickup_lng: float, dropoff_addr: string, dropoff_lat: float, dropoff_lng: float}>
+     */
+    private const KINSHASA_ROUTES = [
+        [
+            'pickup_addr' => 'Gare Centrale, Kinshasa',
+            'pickup_lat' => -4.3217,
+            'pickup_lng' => 15.3125,
+            'dropoff_addr' => 'Aéroport de N\'djili, Kinshasa',
+            'dropoff_lat' => -4.3858,
+            'dropoff_lng' => 15.4446,
+        ],
+        [
+            'pickup_addr' => 'Palais de la Nation, Kinshasa',
+            'pickup_lat' => -4.3276,
+            'pickup_lng' => 15.3136,
+            'dropoff_addr' => 'Marché Central, Kinshasa',
+            'dropoff_lat' => -4.3250,
+            'dropoff_lng' => 15.3089,
+        ],
+        [
+            'pickup_addr' => 'Université de Kinshasa, Lemba',
+            'pickup_lat' => -4.3381,
+            'pickup_lng' => 15.2694,
+            'dropoff_addr' => 'Gombe, Kinshasa',
+            'dropoff_lat' => -4.3196,
+            'dropoff_lng' => 15.2989,
+        ],
+    ];
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
      */
     public function definition(): array
     {
-        $distance = fake()->randomFloat(2, 2, 25);
+        $route = fake()->randomElement(self::KINSHASA_ROUTES);
+        $distance = Ride::distanceKmBetween(
+            $route['pickup_lat'],
+            $route['pickup_lng'],
+            $route['dropoff_lat'],
+            $route['dropoff_lng'],
+        );
         $vehicleType = fake()->randomElement(['eco', 'confort', 'van']);
 
         $requestedAt = fake()->dateTimeBetween('-2 months', 'now');
@@ -26,12 +64,12 @@ class RideFactory extends Factory
         return [
             'client_id' => User::factory(),
             'driver_id' => User::factory()->driver(),
-            'pickup_addr' => fake()->streetAddress().', Kinshasa',
-            'pickup_lat' => fake()->latitude(-4.5, -4.3),
-            'pickup_lng' => fake()->longitude(15.2, 15.4),
-            'dropoff_addr' => fake()->streetAddress().', Kinshasa',
-            'dropoff_lat' => fake()->latitude(-4.5, -4.3),
-            'dropoff_lng' => fake()->longitude(15.2, 15.4),
+            'pickup_addr' => $route['pickup_addr'],
+            'pickup_lat' => $route['pickup_lat'],
+            'pickup_lng' => $route['pickup_lng'],
+            'dropoff_addr' => $route['dropoff_addr'],
+            'dropoff_lat' => $route['dropoff_lat'],
+            'dropoff_lng' => $route['dropoff_lng'],
             'vehicle_type' => $vehicleType,
             'status' => 'completed',
             'price' => Ride::estimatePrice($vehicleType, $distance),

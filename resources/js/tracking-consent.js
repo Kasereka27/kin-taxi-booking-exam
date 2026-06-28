@@ -9,7 +9,7 @@ const MESSAGES = {
   driver:
     "Pour permettre au client de suivre la course en direct, KinTaxiBooking doit accéder à la position GPS de votre appareil pendant cette course. Vos coordonnées sont transmises de façon sécurisée et uniquement le temps de la course active.",
   client:
-    "Pour afficher la position du chauffeur en temps réel, KinTaxiBooking active le suivi GPS de cette course. En acceptant, vous recevez les mises à jour live sur la carte jusqu'à la fin de la course.",
+    "Pour suivre la course en direct, KinTaxiBooking doit accéder à la position GPS de votre appareil. Vos coordonnées seront partagées avec votre chauffeur et vous recevrez la position du chauffeur en temps réel jusqu'à la fin de la course.",
 };
 
 /**

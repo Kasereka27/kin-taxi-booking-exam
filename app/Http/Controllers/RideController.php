@@ -57,12 +57,16 @@ class RideController extends Controller
     {
         $validated = $request->validated();
 
-        $distance = Ride::distanceKmBetween(
-            (float) $validated['pickup_lat'],
-            (float) $validated['pickup_lng'],
-            (float) $validated['dropoff_lat'],
-            (float) $validated['dropoff_lng'],
-        );
+        $routePolyline = $request->decodedRoutePolyline();
+
+        $distance = $routePolyline !== null
+            ? Ride::routeDistanceKm($routePolyline)
+            : Ride::distanceKmBetween(
+                (float) $validated['pickup_lat'],
+                (float) $validated['pickup_lng'],
+                (float) $validated['dropoff_lat'],
+                (float) $validated['dropoff_lng'],
+            );
 
         $ride = $request->user()->ridesAsClient()->create([
             'pickup_addr' => $validated['pickup_addr'],
@@ -71,6 +75,7 @@ class RideController extends Controller
             'dropoff_addr' => $validated['dropoff_addr'],
             'dropoff_lat' => $validated['dropoff_lat'],
             'dropoff_lng' => $validated['dropoff_lng'],
+            'route_polyline' => $routePolyline,
             'vehicle_type' => $validated['vehicle_type'],
             'status' => 'pending',
             'distance_km' => $distance,

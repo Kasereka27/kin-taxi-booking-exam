@@ -12,10 +12,16 @@ it('exige une authentification pour lister les courses', function () {
 
 it('permet à un client de créer une course avec des coordonnées Kinshasa', function () {
     $client = User::factory()->create();
+    $polyline = [
+        [-4.3217, 15.3125],
+        [-4.3500, 15.3800],
+        [-4.3858, 15.4446],
+    ];
 
     $response = $this->actingAs($client)->post(route('rides.store'), [
         ...validRideAddressPayload(),
         'vehicleType' => 'confort',
+        'route_polyline' => json_encode($polyline),
     ]);
 
     $response->assertRedirect(route('user.dashboardClient'));
@@ -26,7 +32,8 @@ it('permet à un client de créer une course avec des coordonnées Kinshasa', fu
         ->and($ride->status)->toBe('pending')
         ->and($ride->vehicle_type)->toBe('confort')
         ->and((float) $ride->pickup_lat)->toBe(-4.3217)
-        ->and((float) $ride->distance_km)->toBeGreaterThan(0)
+        ->and($ride->route_polyline)->toHaveCount(3)
+        ->and((float) $ride->distance_km)->toBe(Ride::routeDistanceKm($polyline))
         ->and((float) $ride->price)->toBeGreaterThan(0);
 });
 

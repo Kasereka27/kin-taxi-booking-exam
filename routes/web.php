@@ -129,6 +129,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::patch('/rides/{ride}/cancel', [RideController::class, 'cancel'])->name('rides.cancel');
     Route::get('/rides/{ride}/tracking', [RideTrackingController::class, 'show'])->name('rides.tracking.show');
     Route::patch('/rides/{ride}/tracking', [RideTrackingController::class, 'update'])->name('rides.tracking');
+    Route::patch('/rides/{ride}/tracking/client', [RideTrackingController::class, 'updateClient'])->name('rides.tracking.client');
     Route::patch('/rides/{ride}/accept', [RideController::class, 'accept'])
         ->middleware('role:driver')
         ->name('rides.accept');

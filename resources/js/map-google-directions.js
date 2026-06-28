@@ -136,6 +136,39 @@ export function drawPreviewPolyline(map, result) {
 }
 
 /**
+ * @param {google.maps.Map} map
+ * @param {[number, number][]} path
+ * @param {google.maps.PolylineOptions} style
+ * @returns {google.maps.Polyline | null}
+ */
+export function drawPathPolyline(map, path, style) {
+  if (!path.length) {
+    return null;
+  }
+
+  return new google.maps.Polyline({
+    path: path.map(toGoogleLatLng),
+    geodesic: true,
+    map,
+    ...style,
+  });
+}
+
+/**
+ * @param {google.maps.DirectionsService} service
+ * @param {[number, number]} pickup
+ * @param {[number, number]} dropoff
+ */
+export async function fetchBookedRoute(service, pickup, dropoff) {
+  const result = await requestDrivingRoute(service, pickup, dropoff);
+
+  return {
+    result,
+    ...pathFromDirectionsResult(result),
+  };
+}
+
+/**
  * @param {{ driverStart: [number, number], pickup: [number, number], dropoff: [number, number], status: string }} tracking
  */
 export function activeRouteEndpoints(tracking) {

@@ -27,6 +27,9 @@ it('expose les variables carte dans la page suivi', function () {
         ->assertOk()
         ->assertSee('trackingRide', false)
         ->assertSee((string) $ride->id)
+        ->assertSee('clientTrackingUrl', false)
+        ->assertSee('isClient', false)
+        ->assertSee('routePolyline', false)
         ->assertSee('Autoriser le suivi GPS')
         ->assertSee('tracking-consent-modal', false)
         ->assertSee('politique de confidentialité');

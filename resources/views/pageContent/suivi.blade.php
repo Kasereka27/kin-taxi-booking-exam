@@ -56,6 +56,7 @@
       <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
         <h2 class="text-xl font-bold">Course <span class="text-gray-500">#{{ $ride->reference() }}</span></h2>
         <div class="flex items-center gap-2 flex-wrap">
+          <span id="tracking-share-status" class="hidden inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700"></span>
           <span id="tracking-live-status" class="hidden inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700"></span>
           <span id="ride-status" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold {{ $statusStyles[1] }}">{{ $statusStyles[0] }}</span>
         </div>
@@ -194,11 +195,15 @@
       'rideId' => $ride->id,
       'pickup' => $ride->pickupCoordinates(),
       'dropoff' => $ride->dropoffCoordinates(),
+      'routePolyline' => $ride->route_polyline,
       'driver' => $ride->driverCoordinates(),
+      'client' => $ride->clientLiveCoordinates(),
       'status' => $ride->status,
       'animate' => $ride->status !== 'pending' && $ride->driver_id !== null,
       'isDriver' => auth()->check() && auth()->id() === $ride->driver_id,
+      'isClient' => auth()->check() && auth()->id() === $ride->client_id,
       'trackingUrl' => route('rides.tracking', $ride),
+      'clientTrackingUrl' => route('rides.tracking.client', $ride),
       'trackingShowUrl' => route('rides.tracking.show', $ride),
   ];
 @endphp

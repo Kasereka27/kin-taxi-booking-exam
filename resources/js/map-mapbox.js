@@ -1,13 +1,43 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { createMarkerElement } from "./map-markers.js";
-import { readTrackingData, showMapSetupMessage, startTrackingSession } from "./map-shared.js";
+import { drawMapboxRouteLayer, fetchMapboxBookedRoute } from "./map-mapbox-directions.js";
+import { buildRoute, readTrackingData, showMapSetupMessage, startTrackingSession } from "./map-shared.js";
 
 /** @param {[number, number]} latLng [lat, lng] */
 function toLngLat([lat, lng]) {
   return [lng, lat];
 }
 
+/**
+ * @param {ReturnType<typeof readTrackingData>} tracking
+ * @param {string} token
+ */
+async function resolveBookedPath(tracking, token) {
+  if (tracking.routePolyline?.length) {
+    return tracking.routePolyline;
+  }
+
+  try {
+    const booked = await fetchMapboxBookedRoute(tracking.pickup, tracking.dropoff, token);
+
+    const distanceEl = document.getElementById("route-distance");
+    if (distanceEl) {
+      distanceEl.textContent = `${booked.distanceKm.toFixed(1)} km`;
+    }
+
+    const etaEl = document.getElementById("eta-value");
+    if (etaEl && tracking.status === "course") {
+      etaEl.textContent = String(booked.durationMinutes);
+    }
+
+    return booked.path;
+  } catch (error) {
+    console.warn("Itinéraire Mapbox indisponible, tracé simplifié utilisé.", error);
+
+    return buildRoute(tracking.driverStart, tracking.pickup, tracking.dropoff, 40);
+  }
+}
 
 export function initMapboxTracking(container, trackingEnabled = true) {
   const token = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
@@ -33,14 +63,25 @@ export function initMapboxTracking(container, trackingEnabled = true) {
 
   map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
 
-  map.on("load", () => {
+  map.on("load", async () => {
+    const bookedPath = tracking.shouldAnimate
+      ? await resolveBookedPath(tracking, token)
+      : [];
+
+    if (bookedPath.length) {
+      drawMapboxRouteLayer(map, bookedPath, "ride-booked-route", "ride-booked-route-line", "#64748b");
+    }
+
     /** @type {import('./map-shared.js').MapAdapter} */
     const mapAdapter = {
       panTo(latLng) {
         map.easeTo({ center: toLngLat(latLng), duration: 500 });
       },
       fitPoints(points, padding = 48) {
-        if (points.length === 0) return;
+        if (points.length === 0) {
+          return;
+        }
+
         const bounds = points.reduce(
           (b, pt) => b.extend(toLngLat(pt)),
           new mapboxgl.LngLatBounds(toLngLat(points[0]), toLngLat(points[0])),
@@ -59,6 +100,10 @@ export function initMapboxTracking(container, trackingEnabled = true) {
       },
     };
 
+    if (window.trackingRide) {
+      window.trackingRide.bookedRoutePath = bookedPath;
+    }
+
     startTrackingSession(
       mapAdapter,
       tracking,
@@ -76,30 +121,23 @@ export function initMapboxTracking(container, trackingEnabled = true) {
           },
         };
       },
-      (route) => {
-        map.addSource("ride-route", {
-          type: "geojson",
-          data: {
-            type: "Feature",
-            properties: {},
-            geometry: {
-              type: "LineString",
-              coordinates: route.map(toLngLat),
-            },
-          },
-        });
+      null,
+      bookedPath.length ? bookedPath : null,
+      null,
+      null,
+      (clientStart) => {
+        const marker = new mapboxgl.Marker({ element: createMarkerElement("client") })
+          .setLngLat(toLngLat(clientStart))
+          .setPopup(
+            new mapboxgl.Popup({ offset: 20, closeButton: false }).setText("Client"),
+          )
+          .addTo(map);
 
-        map.addLayer({
-          id: "ride-route-line",
-          type: "line",
-          source: "ride-route",
-          layout: { "line-join": "round", "line-cap": "round" },
-          paint: {
-            "line-color": "#ffce00",
-            "line-width": 6,
-            "line-opacity": 0.9,
+        return {
+          setLatLng([lat, lng]) {
+            marker.setLngLat(toLngLat([lat, lng]));
           },
-        });
+        };
       },
     );
   });

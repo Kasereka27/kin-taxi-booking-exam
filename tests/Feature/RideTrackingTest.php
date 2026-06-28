@@ -98,6 +98,8 @@ it('expose la position actuelle du chauffeur au client', function () {
         'client_id' => $client->id,
         'driver_id' => $driver->id,
         'status' => 'approche',
+        'client_lat' => -4.319,
+        'client_lng' => 15.311,
     ]);
 
     $this->actingAs($client)
@@ -105,7 +107,54 @@ it('expose la position actuelle du chauffeur au client', function () {
         ->assertOk()
         ->assertJsonPath('lat', -4.32)
         ->assertJsonPath('lng', 15.31)
+        ->assertJsonPath('driver_lat', -4.32)
+        ->assertJsonPath('driver_lng', 15.31)
+        ->assertJsonPath('client_lat', -4.319)
+        ->assertJsonPath('client_lng', 15.311)
         ->assertJsonPath('status', 'approche');
+});
+
+it('permet au client de publier sa position', function () {
+    Event::fake([RideTrackingUpdated::class]);
+
+    $client = User::factory()->create();
+    $driver = User::factory()->driver()->create();
+    $ride = Ride::factory()->create([
+        'client_id' => $client->id,
+        'driver_id' => $driver->id,
+        'status' => 'approche',
+    ]);
+
+    $this->actingAs($client)
+        ->patchJson(route('rides.tracking.client', $ride), [
+            'lat' => -4.3195,
+            'lng' => 15.3115,
+        ])
+        ->assertOk()
+        ->assertJsonPath('status', 'approche');
+
+    Event::assertDispatched(RideTrackingUpdated::class, function (RideTrackingUpdated $event) use ($ride) {
+        return $event->ride->id === $ride->id;
+    });
+
+    expect((float) $ride->fresh()->client_lat)->toBe(-4.3195);
+    expect((float) $ride->fresh()->client_lng)->toBe(15.3115);
+});
+
+it('refuse la mise à jour GPS client au chauffeur', function () {
+    $driver = User::factory()->driver()->create();
+    DriverProfile::factory()->create(['user_id' => $driver->id]);
+    $ride = Ride::factory()->create([
+        'driver_id' => $driver->id,
+        'status' => 'approche',
+    ]);
+
+    $this->actingAs($driver)
+        ->patchJson(route('rides.tracking.client', $ride), [
+            'lat' => -4.32,
+            'lng' => 15.31,
+        ])
+        ->assertForbidden();
 });
 
 it('refuse la consultation GPS à un utilisateur non autorisé', function () {

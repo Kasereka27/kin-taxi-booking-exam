@@ -1,5 +1,6 @@
 import { importLibrary, setOptions } from "@googlemaps/js-api-loader";
 import { estimateRidePrice, RIDE_RATES } from "./ride-rates.js";
+import { pathFromDirectionsResult, requestDrivingRoute } from "./map-google-directions.js";
 
 /** @type {{ south: number, west: number, north: number, east: number }} */
 export const KINSHASA_BOUNDS = {
@@ -256,15 +257,68 @@ export async function initBookingPlaces(form) {
   const pickupLng = /** @type {HTMLInputElement | null} */ (form.querySelector("#pickup_lng"));
   const dropoffLat = /** @type {HTMLInputElement | null} */ (form.querySelector("#dropoff_lat"));
   const dropoffLng = /** @type {HTMLInputElement | null} */ (form.querySelector("#dropoff_lng"));
+  const routePolylineInput = /** @type {HTMLInputElement | null} */ (
+    form.querySelector("#route_polyline")
+  );
 
   if (!pickupInput || !dropoffInput || !pickupLat || !pickupLng || !dropoffLat || !dropoffLng) {
     return;
   }
 
+  let directionsService = null;
+  let routeRequestId = 0;
+
+  const refreshRoutePolyline = async () => {
+    if (
+      !pickupLat.value ||
+      !pickupLng.value ||
+      !dropoffLat.value ||
+      !dropoffLng.value ||
+      !routePolylineInput
+    ) {
+      if (routePolylineInput) {
+        routePolylineInput.value = "";
+      }
+
+      return;
+    }
+
+    const requestId = ++routeRequestId;
+
+    try {
+      if (!directionsService) {
+        await importLibrary("routes");
+        directionsService = new google.maps.DirectionsService();
+      }
+
+      const result = await requestDrivingRoute(
+        directionsService,
+        [Number(pickupLat.value), Number(pickupLng.value)],
+        [Number(dropoffLat.value), Number(dropoffLng.value)],
+      );
+
+      if (requestId !== routeRequestId) {
+        return;
+      }
+
+      const { path } = pathFromDirectionsResult(result);
+
+      if (path.length >= 2) {
+        routePolylineInput.value = JSON.stringify(path);
+      }
+    } catch (error) {
+      console.warn("Itinéraire réservation indisponible.", error);
+
+      if (requestId === routeRequestId && routePolylineInput) {
+        routePolylineInput.value = "";
+      }
+    }
+  };
+
   const autocompleteService = new google.maps.places.AutocompleteService();
   const placesService = new google.maps.places.PlacesService(document.createElement("div"));
 
-  const updateEstimate = () => {
+  const updateEstimate = async () => {
     const estimate = document.getElementById("estimate");
     const vehicleType = document.getElementById("vehicleType")?.value || "eco";
 
@@ -272,12 +326,37 @@ export async function initBookingPlaces(form) {
       return;
     }
 
-    const distance = distanceKmBetween(
+    await refreshRoutePolyline();
+
+    let distance = distanceKmBetween(
       Number(pickupLat.value),
       Number(pickupLng.value),
       Number(dropoffLat.value),
       Number(dropoffLng.value),
     );
+
+    if (routePolylineInput?.value) {
+      try {
+        const path = JSON.parse(routePolylineInput.value);
+        let routed = 0;
+
+        for (let index = 1; index < path.length; index++) {
+          routed += distanceKmBetween(
+            Number(path[index - 1][0]),
+            Number(path[index - 1][1]),
+            Number(path[index][0]),
+            Number(path[index][1]),
+          );
+        }
+
+        if (routed > 0) {
+          distance = Math.round(routed * 10) / 10;
+        }
+      } catch {
+        // Conserver la distance à vol d'oiseau.
+      }
+    }
+
     const price = estimateRidePrice(vehicleType, distance);
     const rate = RIDE_RATES[vehicleType] ?? RIDE_RATES.eco;
     const eta = Math.round(distance * 1.8 + 3);

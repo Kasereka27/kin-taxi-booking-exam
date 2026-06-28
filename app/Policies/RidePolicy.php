@@ -56,4 +56,12 @@ class RidePolicy
             && $ride->driver_id === $user->id
             && $ride->isTrackable();
     }
+
+    /**
+     * Mise à jour GPS par le client pendant une course active.
+     */
+    public function trackClient(User $user, Ride $ride): bool
+    {
+        return $ride->client_id === $user->id && $ride->isTrackable();
+    }
 }
